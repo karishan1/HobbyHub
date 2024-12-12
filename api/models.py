@@ -2,9 +2,18 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+class Hobby(models.Model):
+    # Uniquely identifies each hobby to avoid duplicate hobbies
+    hobby_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.hobby_name
+
 class User(AbstractUser):
     # User model inherits from AbstractUser
-    date_of_birth = models.DateField(null=True, blank=True)
+    DOB = models.DateField(null=True,blank=True)
+    Hobbies = models.ManyToManyField(Hobby)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name="user_groups",
@@ -22,27 +31,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Hobby(models.Model):
-    # Uniquely identifies each hobby to avoid duplicate hobbies
-    hobby_name = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.hobby_name
-
-
-class UserHobby(models.Model):
-    # Establishes Many to Many relationship between User and Hobby
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="user_hobbies",)
-    hobby = models.ForeignKey(Hobby,on_delete=models.CASCADE,related_name="hobby_user",)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.hobby.hobby_name}"
-
-    class Meta:
-        # Establishes uniqueness between combination of User and Hobby
-        unique_together = ('user', 'hobby')
 
 
 class Friendship(models.Model):

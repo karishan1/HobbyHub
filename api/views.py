@@ -1,8 +1,12 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
 from .models import Hobby
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 
 
 import json
@@ -27,13 +31,14 @@ def view_hobby(request):
 
 
 def login_view(request):
+    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")  # Replace 'profile' with your desired redirect URL name
+            return redirect("home") 
         else:
             return render(request, "login.html", {"error": "Invalid username or password"})
     
@@ -45,6 +50,7 @@ def home_view(request):
 
 
 def logout_view(request):
+    logout(request)
     return render(request, "login.html")
     # Redirect to a success page.
 
@@ -66,10 +72,18 @@ def signup_view(request):
         if User.objects.filter(username=username).exists():
             return render(request, "signup.html", {"error": "Username already taken."})
         
+
+        try:
+            validate_password(password, user=User(username=username))
+        except ValidationError as e:
+            return render(request, "signup.html", {"error": e.messages[0]})
+        
+        hashed_password = make_password(password)
+        
         user = User.objects.create(
             username=username,
             email=email,
-            password=password # Do hash later
+            password=hashed_password 
         )
         user.save()
 

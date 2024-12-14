@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.http import HttpResponse
-from .views import login_view,home_view,logout_view
+from .views import login_view,home_view,logout_view,signup_view
 
 
 
@@ -28,5 +28,6 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("home/", home_view, name="home"),
     path("logout/",logout_view, name = "logout"),
+    path("signup/",signup_view, name = "signup"),
     
 ]

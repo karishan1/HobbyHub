@@ -2,6 +2,8 @@ from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from .models import Hobby
+from django.contrib.auth.models import User
+
 
 import json
 
@@ -45,3 +47,33 @@ def home_view(request):
 def logout_view(request):
     return render(request, "login.html")
     # Redirect to a success page.
+
+def signup_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        email = request.POST.get("email")
+        dob = request.POST.get("dob")
+        hobbies = request.POST.get("hobbies")
+
+        if password != confirm_password:
+                return render(request, "signup.html", {"error": "Passwords do not match."})
+        
+        if not username or not password or not email:
+            return render(request, "signup.html", {"error": "All fields are required."})
+        
+        if User.objects.filter(username=username).exists():
+            return render(request, "signup.html", {"error": "Username already taken."})
+        
+        user = User.objects.create(
+            username=username,
+            email=email,
+            password=password # Do hash later
+        )
+        user.save()
+
+        login(request, user)
+        return redirect("login")
+    
+    return render(request, "signup.html")

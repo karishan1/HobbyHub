@@ -31,6 +31,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def to_dict(self):
+        return{
+            'id' : self.id,
+            'username': self.username,
+            'password': self.password,
+            'email': self.email,
+            'DOB': self.DOB,
+            'hobbies': self.get_hobbies()
+        }
+    
+    def get_hobbies(self):
+        return [x.hobby_name for x in self.Hobbies.all()]
 
 
 class Friendship(models.Model):

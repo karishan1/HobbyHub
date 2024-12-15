@@ -60,8 +60,6 @@ def signup_view(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         email = request.POST.get("email")
-        dob = request.POST.get("dob")
-        hobbies = request.POST.get("hobbies")
 
         if password != confirm_password:
                 return render(request, "signup.html", {"error": "Passwords do not match."})
@@ -91,3 +89,10 @@ def signup_view(request):
         return redirect("login")
     
     return render(request, "signup.html")
+
+
+def user_view(request):
+    if request.method == 'GET':
+        all_users = User.objects.all()
+        user_list = [x.to_dict() for x in all_users]
+        return JsonResponse(user_list, safe=False)

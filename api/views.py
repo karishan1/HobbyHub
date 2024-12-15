@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
 from .models import Hobby
 from django.contrib.auth.models import User
@@ -90,9 +90,9 @@ def signup_view(request):
     
     return render(request, "signup.html")
 
-
 def user_view(request):
     if request.method == 'GET':
+        User = get_user_model()
         all_users = User.objects.all()
         user_list = [x.to_dict() for x in all_users]
         return JsonResponse(user_list, safe=False)

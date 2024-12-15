@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser # type: ignore
+
 
 
 class Hobby(models.Model):
@@ -13,21 +14,6 @@ class User(AbstractUser):
     # User model inherits from AbstractUser
     DOB = models.DateField(null=True,blank=True)
     Hobbies = models.ManyToManyField(Hobby)
-
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name="user_groups",
-        blank=True,
-        help_text=("The groups this user belongs to."),
-        verbose_name=("groups"),
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name="user_permissions",
-        blank=True,
-        help_text=("Specific permissions for this user."),
-        verbose_name=("user permissions"),
-    )
 
     def __str__(self):
         return self.username
@@ -44,6 +30,22 @@ class User(AbstractUser):
     
     def get_hobbies(self):
         return [x.hobby_name for x in self.Hobbies.all()]
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name="user_groups",
+        blank=True,
+        help_text=("The groups this user belongs to."),
+        verbose_name=("groups"),
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name="user_permissions",
+        blank=True,
+        help_text=("Specific permissions for this user."),
+        verbose_name=("user permissions"),
+    )
+
 
 
 class Friendship(models.Model):
@@ -70,12 +72,6 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
-
-
-
-
-
-
 
 
 # idk what this is it was created before 

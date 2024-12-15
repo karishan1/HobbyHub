@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'api/spa/assets/login.css' %}">
 
 </head>
 <body>
@@ -20,13 +19,13 @@
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter Username" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter Password" required>
             </div>
 
             <button type="submit" class="btn">Login</button>
@@ -36,3 +35,104 @@
     </div>
 </body>
 </html>
+<style>
+    /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+/* Login Container */
+.login-container {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Form Styles */
+
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+input {
+    width: 22rem;
+    height: 2.5rem;
+    padding-left: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+/* Button Styles */
+.btn {
+    width: 23rem;
+    height: 2.8rem;
+    background: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
+
+/* Error Message */
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Signup Link */
+p {
+    text-align: center;
+    margin-top: 15px;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+</style>

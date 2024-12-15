@@ -6,12 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="{% static 'api/spa/assets/signup.css' %}">
 
 </head>
 <body>
     <div class="signup-container">
-        <h1>Create an Account</h1>
+        <h1>Create Account</h1>
 
         {% if error %}
             <p class="error">{{ error }}</p>
@@ -20,23 +19,23 @@
         <form method="post" class="form">
             {% csrf_token %}
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter Username" required>
             </div>
 
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter Email Address" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter Password"required>
             </div>
 
             <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Retype Password" required>
             </div>
 
             <button type="submit" class="btn">Sign Up</button>
@@ -46,3 +45,101 @@
     </div>
 </body>
 </html>
+<style>
+    /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Signup Container */
+.signup-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Form Styles */
+form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 22rem;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+/* Button Styles */
+.btn {
+    width: 23.5rem;
+    height: 2.8rem;
+    background: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.btn:hover {
+    background: #0056b3;
+}
+
+/* Error Message */
+.error {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Signup Link */
+p {
+    text-align: center;
+    margin-top: 15px;
+}
+
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+</style>

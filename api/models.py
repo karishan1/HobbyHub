@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser # type: ignore
+
 
 
 class Hobby(models.Model):
@@ -13,6 +14,22 @@ class User(AbstractUser):
     # User model inherits from AbstractUser
     DOB = models.DateField(null=True,blank=True)
     Hobbies = models.ManyToManyField(Hobby)
+
+    def __str__(self):
+        return self.username
+    
+    def to_dict(self):
+        return{
+            'id' : self.id,
+            'username': self.username,
+            'password': self.password,
+            'email': self.email,
+            'DOB': self.DOB,
+            'hobbies': self.get_hobbies()
+        }
+    
+    def get_hobbies(self):
+        return [x.hobby_name for x in self.Hobbies.all()]
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -29,8 +46,6 @@ class User(AbstractUser):
         verbose_name=("user permissions"),
     )
 
-    def __str__(self):
-        return self.username
 
 
 class Friendship(models.Model):
@@ -57,12 +72,6 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
-
-
-
-
-
-
 
 
 # idk what this is it was created before 

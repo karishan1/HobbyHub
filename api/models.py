@@ -13,7 +13,7 @@ class Hobby(models.Model):
 class User(AbstractUser):
     # User model inherits from AbstractUser
     DOB = models.DateField(null=True,blank=True)
-    Hobbies = models.ManyToManyField(Hobby)
+    Hobbies = models.ManyToManyField(Hobby,blank=True)
 
     def __str__(self):
         return self.username
@@ -27,6 +27,15 @@ class User(AbstractUser):
             'DOB': self.DOB,
             'hobbies': self.get_hobbies()
         }
+    
+    def to_dict_user_list(self):
+        return{
+            'id' : self.id,
+            'username': self.username,
+            'DOB': self.DOB,
+            'hobbies': self.get_hobbies()
+        }
+    
     
     def get_hobbies(self):
         return [x.hobby_name for x in self.Hobbies.all()]

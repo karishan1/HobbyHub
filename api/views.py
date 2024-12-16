@@ -3,7 +3,10 @@ from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
 from .models import Hobby
 from .forms import CustomUserCreationForm
+
 from django.core.paginator import Paginator
+from django.utils import timezone
+from datetime import timedelta
 
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -83,6 +86,14 @@ def user_list_view(request):
     if request.method == 'GET':
         User = get_user_model()
         all_users = User.objects.all()
+
+        min_age = request.GET.get('min_age',None)
+        max_age = request.GET.get('max_age',None)
+
+        if min_age:
+            all_users = all_users.filter(DOB__lte=timezone.now() - timedelta(days=int(min_age)*365))
+        if max_age:
+            all_users = all_users.filter(DOB__gte=timezone.now() - timedelta(days=int(max_age)*365))
 
         page_number = request.GET.get('page', 1)
         paginator = Paginator(all_users, 10)

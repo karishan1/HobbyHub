@@ -2,12 +2,9 @@ from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
 from .models import Hobby
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+from .forms import CustomUserCreationForm
 
-
+from django.contrib.auth.forms import AuthenticationForm
 
 import json
 
@@ -31,18 +28,20 @@ def view_hobby(request):
 
 
 def login_view(request):
-    
+    """
+    Handle user login.
+    """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
-            return redirect("home") 
+            return redirect("http://localhost:5173/")  # Redirect to Vue frontend
         else:
-            return render(request, "login.html", {"error": "Invalid username or password"})
+            return render(request, "login.html", {"form": form, "error": "Invalid username or password."})
     
-    return render(request, "login.html")  # Renders the login.html template for GET requests
+    form = AuthenticationForm()
+    return render(request, "login.html", {"form": form})  # Render the login page fo
 
 def home_view(request):
     #hobbies = request.user.hobbies.all()
@@ -55,40 +54,26 @@ def logout_view(request):
     # Redirect to a success page.
 
 def signup_view(request):
+    """
+    Handle user signup and account creation.
+    """
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
-        email = request.POST.get("email")
+        print("Received POST request with data:", request.POST)  # Log incoming POST data
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            print("Form is valid. Creating user...")  # Log form validation success
+            user = form.save()  # Save the new user
+            print(f"User created: {user.username} (ID: {user.id})")  # Log user details
+            login(request, user)  # Log in the user
+            print(f"User logged in: {user.username}")  # Log successful login
+            return redirect("home")  # Redirect to the home page or desired URL
+        else:
+            print("Form is invalid. Errors:", form.errors)  # Log form validation errors
+            return render(request, "signup.html", {"form": form})  # Re-render with errors
 
-        if password != confirm_password:
-                return render(request, "signup.html", {"error": "Passwords do not match."})
-        
-        if not username or not password or not email:
-            return render(request, "signup.html", {"error": "All fields are required."})
-        
-        if User.objects.filter(username=username).exists():
-            return render(request, "signup.html", {"error": "Username already taken."})
-        
-
-        try:
-            validate_password(password, user=User(username=username))
-        except ValidationError as e:
-            return render(request, "signup.html", {"error": e.messages[0]})
-        
-        hashed_password = make_password(password)
-        
-        user = User.objects.create(
-            username=username,
-            email=email,
-            password=hashed_password 
-        )
-        user.save()
-
-        login(request, user)
-        return redirect("login")
-    
-    return render(request, "signup.html")
+    print("Rendering signup form for GET request.")  # Log GET request
+    form = CustomUserCreationForm()
+    return render(request, "signup.html", {"form": form})
 
 def user_view(request):
     if request.method == 'GET':

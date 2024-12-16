@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
 from .models import Hobby
 from .forms import CustomUserCreationForm
+from django.core.paginator import Paginator
 
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -76,4 +77,16 @@ def user_view(request):
         User = get_user_model()
         all_users = User.objects.all()
         user_list = [x.to_dict() for x in all_users]
+        return JsonResponse(user_list, safe=False)
+    
+def user_list_view(request):
+    if request.method == 'GET':
+        User = get_user_model()
+        all_users = User.objects.all()
+
+        page_number = request.GET.get('page', 1)
+        paginator = Paginator(all_users, 10)
+        page_object = paginator.get_page(page_number)
+
+        user_list = [x.to_dict_user_list() for x in page_object]
         return JsonResponse(user_list, safe=False)

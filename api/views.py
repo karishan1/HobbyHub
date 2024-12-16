@@ -61,14 +61,10 @@ def signup_view(request):
         print("Received POST request with data:", request.POST)  # Log incoming POST data
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            print("Form is valid. Creating user...")  # Log form validation success
             user = form.save()  # Save the new user
-            print(f"User created: {user.username} (ID: {user.id})")  # Log user details
             login(request, user)  # Log in the user
-            print(f"User logged in: {user.username}")  # Log successful login
-            return redirect("home")  # Redirect to the home page or desired URL
+            return redirect("http://localhost:5173/")
         else:
-            print("Form is invalid. Errors:", form.errors)  # Log form validation errors
             return render(request, "signup.html", {"form": form})  # Re-render with errors
 
     print("Rendering signup form for GET request.")  # Log GET request

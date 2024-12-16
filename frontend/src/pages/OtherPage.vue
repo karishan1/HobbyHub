@@ -1,17 +1,33 @@
 <template>
     <div class="h3">
-      {{ user_arr }}
+      <ul>
+        <li  v-for="user in user_arr" :key="user.id" >
+          <p>{{ user.username }}</p>
+          <ul>
+            <li v-for="hobby in user.hobbies" :key="hobby">
+              <p>{{ hobby}}</p>
+            </li>
+          </ul>
+
+        </li>
+      </ul>
     </div>
   </template>
   
   <script lang="ts">
       import { defineComponent } from "vue";
+
+      interface User {
+        id: number,
+        username: string,
+        hobbies: string[]
+      }
   
       export default defineComponent({
           data() {
               return {
                   title: "Other Page",
-                  user_arr: []
+                  user_arr: [] as User[]
               }
           },
           methods:{

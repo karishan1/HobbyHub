@@ -1,14 +1,17 @@
 <template>
-    <div class="h3">
+    <div class="list-container">
       <ul>
-        <li  v-for="user in user_arr" :key="user.id" >
-          <p>{{ user.username }}</p>
-          <ul>
-            <li v-for="hobby in user.hobbies" :key="hobby">
-              <p>{{ hobby}}</p>
-            </li>
-          </ul>
-
+        <li class="user-container"  v-for="user in user_arr" :key="user.id" >
+          <div class="div-1">
+            <p>Name:</p>
+            <p class="name">{{ user.username }}</p>
+          </div>
+          <div class="div-1">
+            <p>Hobbies:</p>
+            <ul class="hobby-container">
+              <li class="hobby-box" v-for="hobby in user.hobbies" :key="hobby" :style="{backgroundColor: getRandomColor()}">{{ hobby}}</li>
+            </ul>
+          </div>
         </li>
       </ul>
     </div>
@@ -31,7 +34,7 @@
                   local_user: {
                     id: 100,
                     username: "Sajith",
-                    hobbies: ["gaming","golf","football","guitar"]
+                    hobbies: ["golf","guitar","swimming","gaming"]
                   }
               }
           },
@@ -70,6 +73,15 @@
               }
 
               return user_arr
+            },
+            getRandomColor(): string {
+              const hex = "0123456789ABCDEF";
+              let color = "#";
+
+              for (let i = 0; i < 6; i++){
+                color += hex[Math.floor(Math.random()*15)];
+              }
+              return color
             }
 
 
@@ -81,5 +93,71 @@
   </script>
   
   <style scoped>
+
+  .list-container{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100vw;
+    height: 100vh;
+    margin-top: 3rem; 
+  }
+  ul{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style-type: none;
+  }
+
+  .user-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-radius: 1rem;
+    width: 40rem;
+
+  }
+
+  .hobby-container{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-radius: 0.5rem;
+    max-width: 33rem;
+    margin-left: 1rem;
+  }
+  .hobby-box{
+    color: white;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0.3rem;
+    align-self: center;
+  }
+
+  .name{
+    color: white;
+    background-color: #007BFF;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0.3rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-left: 1rem;
+  }
+
+  .div-1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+  }
   </style>
   

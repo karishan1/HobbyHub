@@ -167,6 +167,6 @@
     align-items: center;
     justify-content: center;
     justify-items: center;
-  }
+  }      
   </style>
   

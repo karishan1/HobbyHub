@@ -40,7 +40,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("http://localhost:5173/")  # Redirect to Vue frontend
+            return redirect(f"http://localhost:5173/?user_id={user.id}")  # Redirect to Vue frontend
         else:
             return render(request, "login.html", {"form": form, "error": "Invalid username or password."})
     

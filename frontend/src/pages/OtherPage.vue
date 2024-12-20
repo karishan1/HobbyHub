@@ -5,8 +5,9 @@
           <div class="div-1">
             <p>Name:</p>
             <p class="name">{{ user.username }}</p>
+            <button class="add_button">Add Friend</button>
           </div>
-          <div class="div-1">
+          <div class="div-2">
             <p>Hobbies:</p>
             <ul class="hobby-container">
               <li class="hobby-box" v-for="hobby in user.hobbies" :key="hobby" :style="{backgroundColor: getRandomColor()}">{{ hobby}}</li>
@@ -113,6 +114,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: flex-start;
     padding: 1rem;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -153,6 +155,13 @@
   }
 
   .div-1{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 38rem;
+  }
+  .div-2{
     display: flex;
     flex-direction: row;
     align-items: center;

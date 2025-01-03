@@ -3,6 +3,8 @@ from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
 from .models import Hobby
 from .forms import CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
+
 
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -40,12 +42,12 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect(f"http://localhost:5173/?user_id={user.id}")  # Redirect to Vue frontend
+            return redirect("http://localhost:5173/")  # Redirect to Vue frontend
         else:
             return render(request, "login.html", {"form": form, "error": "Invalid username or password."})
-    
+
     form = AuthenticationForm()
-    return render(request, "login.html", {"form": form})  # Render the login page fo
+    return render(request, "login.html", {"form": form})
 
 def home_view(request):
     #hobbies = request.user.hobbies.all()
@@ -101,3 +103,18 @@ def user_list_view(request):
 
         user_list = [x.to_dict_user_list() for x in page_object]
         return JsonResponse(user_list, safe=False)
+
+
+@login_required
+def current_user_view(request):
+    if request.user.is_authenticated:
+        user_data = {
+            "id": request.user.id,
+            "username": request.user.username,
+            "email": request.user.email,
+            "DOB": getattr(request.user, "DOB", None),
+            "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
+        }
+        return JsonResponse(user_data)
+    else:
+        return JsonResponse({"error": "User is not authenticated"}, status=401)

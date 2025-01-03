@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <div class="signup-container">
@@ -34,6 +35,11 @@
             </div>
 
             <div class="form-group">
+                <label for="DOB">Date of Birth</label>
+                <input type="date" id="DOB" name="DOB" value="{{ form.DOB.value|default:'' }}" required>
+            </div>
+
+            <div class="form-group">
                 <label for="password1">Password</label>
                 <input type="password" id="password1" name="password1" placeholder="Enter Password" required>
             </div>
@@ -50,9 +56,8 @@
     </div>
 </body>
 </html>
-
 <style>
-    /* General Styles */
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -81,7 +86,7 @@ h1 {
 }
 
 /* Form Styles */
-form{
+form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -146,4 +151,5 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
 </style>

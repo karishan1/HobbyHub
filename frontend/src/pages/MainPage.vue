@@ -1,52 +1,62 @@
 <template>
-  <div class="h1">
-    <h2>{{ title }}</h2>
-    <div v-if="user_profile">
-      <p>{{user_profile.username}}</p>
-      <p>{{user_profile.password}}</p>
-      <p>{{user_profile.email}}</p>
-      <p>{{user_profile.DOB}}</p>
-      <p>{{user_profile.hobbies}}</p>
+  <div>
+    <h1>{{ title }}</h1>
+    <div v-if="error">
+      <p>Error: {{ error }}</p>
+    </div>
+    <div v-else-if="user.username">
+      <p>Username: {{ user.username }}</p>
+      <p>Email: {{ user.email }}</p>
+      <p>DOB: {{ user.DOB }}</p>
+      <ul>
+        <li v-for="hobby in user.hobbies" :key="hobby">{{ hobby }}</li>
+      </ul>
+    </div>
+    <div v-else>
+      <p>Loading user data...</p>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent } from "vue";
-
-    interface User {
-        id: number,
-        username: string,
-        password: string,
-        email: string,
-        DOB: Date,
-        hobbies: string[]
-      }
-
-
-    export default defineComponent({
-      name: "MainPage",
-        data() {
-            return {
-                title: "Main Page",
-                user_id: sessionStorage.getItem('user_id'),
-                user_profile : null as User | null,
-            }
-        },
-        methods:{
-          async fetch_users(){
-                const response = await fetch('http://127.0.0.1:8000/user/');
-                const data = await response.json();
-
-                const user = data.find((u: User) => u.id === parseInt(this.user_id!));
-
-                this.user_profile = user;
-            }
-        },
-        created(){
-          this.fetch_users();
-        }
-    })
+<script>
+export default {
+  name: "MainPage",
+  data() {
+    return {
+      title: "Main Page",
+      user: {
+        username: "",
+        email: "",
+        DOB: "",
+        hobbies: [],
+      },
+      error: null,
+    };
+  },
+  methods: {
+    fetchUser() {
+      fetch("http://127.0.0.1:8000/api/current-user/", {
+        method: "GET",
+        credentials: "include", 
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          this.user = data; 
+        })
+        .catch((error) => {
+          this.error = error.message; 
+        });
+    },
+  },
+  created() {
+    this.fetchUser(); 
+  },
+};
 </script>
 
 <style scoped>

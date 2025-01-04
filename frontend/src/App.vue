@@ -14,10 +14,6 @@
             <RouterView />
         </main>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2025 HobbyHub</p>
-        </footer>
     </div>
 </template>
 

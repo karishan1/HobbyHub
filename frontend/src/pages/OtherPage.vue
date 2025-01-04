@@ -1,28 +1,31 @@
 <template>
     <div class="list-container">
       <ul>
-        <li class="user-container"  v-for="user in user_arr" :key="user.id" >
-          <div class="div-1">
-            <p>Name:</p>
-            <p class="name">{{ user.username }}</p>
-            <button class="add_button">Add Friend</button>
-          </div>
-          <div class="div-2">
-            <p>Hobbies:</p>
-            <ul class="hobby-container">
-              <li class="hobby-box" v-for="hobby in user.hobbies" :key="hobby" :style="{backgroundColor: getRandomColor()}">{{ hobby}}</li>
-            </ul>
-          </div>
+        <li class="user-container"  v-for="user in user_arr"   :key="user.id" >
+            <div class="div-1">
+              <p>Name:</p>
+              <p class="name">{{ user.username }}</p>
+              <button class="add_button">Add Friend</button>
+            </div>
+            <div class="div-2">
+              <p>Hobbies:</p>
+              <ul class="hobby-container">
+                <li class="hobby-box"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
+              </ul>
+            </div>
         </li>
       </ul>
     </div>
+  
   </template>
   
   <script lang="ts">
       import { defineComponent } from "vue";
+      import { useUserStore } from '../stores/userStore';
+      
 
       interface User {
-        id: number,
+        id: string,
         username: string,
         hobbies: string[]
       }
@@ -32,18 +35,42 @@
               return {
                   title: "Other Page",
                   user_arr: [] as User[],
-                  local_user: {
-                    id: 100,
-                    username: "Sajith",
-                    hobbies: ["golf","guitar","swimming","gaming"]
-                  }
               }
+          },
+          setup(){
+            const userStore = useUserStore();
+            userStore.loadUser();
+
+            return {userStore};
+          },
+          computed: {
+              local_user():User{
+                return{
+                  id: this.userStore.user_id,
+                  username: this.userStore.username,
+                  hobbies: this.userStore.hobbies
+                };
+              },
           },
           methods:{
             async fetch_users(){
-                const response = await fetch('http://127.0.0.1:8000/user_list/');
-                const data = await response.json();
-                this.user_arr = this.mostCommonHobbies(data, this.local_user);
+              fetch("http://127.0.0.1:8000/user_list/", {
+                  method: "GET",
+                  credentials: "include", 
+                })
+                  .then((response) => {
+                    if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                  })
+                  .then((data) => {
+                    this.user_arr = data; 
+
+                  })
+                  .catch((error) => {
+                    error = error.message; 
+                  });
             },
             mostCommonHobbies(user_arr: User[], local_user: User): User[]{
               function getCommonHobbyCount(user_hobbies : string[], local_user_hobbies : string[]): number{
@@ -75,19 +102,10 @@
 
               return user_arr
             },
-            getRandomColor(): string {
-              const hex = "0123456789ABCDEF";
-              let color = "#";
-
-              for (let i = 0; i < 6; i++){
-                color += hex[Math.floor(Math.random()*15)];
-              }
-              return color
-            }
 
 
           },
-          created(){
+          mounted(){
             this.fetch_users();
           }
       })
@@ -101,7 +119,7 @@
     justify-content: flex-start;
     width: 100vw;
     height: 100vh;
-    margin-top: 3rem; 
+    margin-top: 10rem; 
   }
   ul{
     display: flex;
@@ -141,6 +159,7 @@
     padding-right: 1rem;
     border-radius: 0.3rem;
     align-self: center;
+    background-color: #057BFF;
   }
 
   .name{

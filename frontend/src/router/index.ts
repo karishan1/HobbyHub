@@ -20,14 +20,5 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach((to,from,next) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const user_id = urlParams.get('user_id');
 
-    if (user_id) {
-        sessionStorage.setItem("user_id", user_id);
-    }
-    next();
-
-})
 export default router

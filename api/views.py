@@ -57,23 +57,22 @@ def home_view(request):
 def logout_view(request):
     logout(request)
     return render(request, "login.html")
-    # Redirect to a success page.
 
 def signup_view(request):
     """
     Handle user signup and account creation.
     """
     if request.method == "POST":
-        print("Received POST request with data:", request.POST)  # Log incoming POST data
+        print("Received POST request with data:", request.POST)  
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()  # Save the new user
             login(request, user)  # Log in the user
             return redirect("http://localhost:5173/")
         else:
-            return render(request, "signup.html", {"form": form})  # Re-render with errors
+            return render(request, "signup.html", {"form": form})  
 
-    print("Rendering signup form for GET request.")  # Log GET request
+    print("Rendering signup form for GET request.") 
     form = CustomUserCreationForm()
     return render(request, "signup.html", {"form": form})
 
@@ -108,6 +107,36 @@ def user_list_view(request):
 @login_required
 def current_user_view(request):
     if request.user.is_authenticated:
+        if request.method == "PUT":
+            try:
+                data = json.loads(request.body)
+                
+                user = request.user
+                if "username" in data:
+                    user.username = data["username"]
+                if "email" in data:
+                    user.email = data["email"]
+                if "DOB" in data:
+                    user.DOB = data["DOB"]  
+                if "hobbies" in data:
+                    if hasattr(user, "set_hobbies"):  
+                        user.set_hobbies(data["hobbies"])
+                
+                user.save()
+                user_data = {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "DOB": getattr(user, "DOB", None),
+                    "hobbies": getattr(user, "get_hobbies", lambda: [])(),
+                }
+                return JsonResponse(user_data)
+            
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON data"}, status=400)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+
         user_data = {
             "id": request.user.id,
             "username": request.user.username,
@@ -116,5 +145,7 @@ def current_user_view(request):
             "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
         }
         return JsonResponse(user_data)
+
     else:
         return JsonResponse({"error": "User is not authenticated"}, status=401)
+    

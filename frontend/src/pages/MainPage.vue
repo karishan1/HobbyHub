@@ -76,14 +76,12 @@
 
     <div v-if="showHobbiesModal" class="modal">
       <div class="modal-content">
-        <h4>Add a New Hobby</h4>
-        <!-- Input field for adding a new hobby -->
+        <h4>Add a New Hobby to the Database</h4>
         <input v-model="newHobbyName" placeholder="Type new hobby name..." />
         <button @click="addNewHobby" class="add-btn">Add Hobby</button>
 
         <h4>Available Hobbies</h4>
-        <!-- List of available hobbies -->
-        <ul class = "scrollable-list">
+        <ul>
           <li v-for="hobby in availableHobbies" :key="hobby.id" class="hobby-item">
             {{ hobby.hobby_name }}
             <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
@@ -196,62 +194,63 @@ export default defineComponent({
       }
     },
 
-   async addNewHobby() {
-    if (!this.newHobbyName.trim()) {
-      alert("Hobby name cannot be empty.");
-      return;
-    }
-
-    try {
-      const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
-
-      const response = await fetch("http://127.0.0.1:8000/add_hobby_to_db/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        body: JSON.stringify({ hobby_name: this.newHobbyName }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add new hobby to the database: ${response.status}`);
+    async addNewHobby() {
+      if (!this.newHobbyName.trim()) {
+        alert("Hobby name cannot be empty.");
+        return;
       }
 
-      alert("Hobby added to the database successfully!");
-      this.newHobbyName = ""; // Clear the input field
-      await this.fetchHobbies(); // Refresh the available hobbies list
-    } catch (error) {
-      console.error("Error adding new hobby to the database:", error);
-    }
-  },
-  async removeHobby(hobbyName: string) {
-    try {
-      const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
+      try {
+        const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
 
-      const response = await fetch("http://127.0.0.1:8000/remove_user_hobby/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        body: JSON.stringify({ hobby_name: hobbyName }),
-        credentials: "include",
-      });
+        const response = await fetch("http://127.0.0.1:8000/add_hobby_to_db/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ hobby_name: this.newHobbyName }),
+          credentials: "include",
+        });
 
-      if (!response.ok) {
-        throw new Error(`Failed to remove hobby: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`Failed to add new hobby to the database: ${response.status}`);
+        }
+
+        alert("Hobby added to the database successfully!");
+        this.newHobbyName = "";
+        await this.fetchHobbies();
+      } catch (error) {
+        console.error("Error adding new hobby to the database:", error);
       }
+    },
 
-      // Remove the hobby from the user's list in the frontend
-      this.user.hobbies = this.user.hobbies.filter((hobby) => hobby !== hobbyName);
+    async removeHobby(hobbyName: string) {
+      try {
+        const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
 
-      alert("Hobby removed successfully!");
-    } catch (error) {
-      console.error("Error removing hobby:", error);
-    }
-  },
+        const response = await fetch("http://127.0.0.1:8000/remove_user_hobby/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ hobby_name: hobbyName }),
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to remove hobby: ${response.status}`);
+        }
+
+        this.user.hobbies = this.user.hobbies.filter((hobby) => hobby !== hobbyName);
+
+        alert("Hobby removed successfully!");
+      } catch (error) {
+        console.error("Error removing hobby:", error);
+      }
+    },
+
     editDetails() {
       this.editedUser = { ...this.user };
       this.isEditing = true;
@@ -296,6 +295,11 @@ export default defineComponent({
         newPassword: "",
         confirmPassword: "",
       };
+    },
+    async changePassword() {
+      // Implement the password change logic here
+      // For example, you might want to send a request to the server
+      // to update the user's password using the values in passwordForm.
     },
   },
   created() {

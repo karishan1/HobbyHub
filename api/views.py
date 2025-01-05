@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
-from .models import Hobby
+from .models import Hobby, User
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-
+from django.views.decorators.csrf import csrf_exempt
 
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -32,7 +32,6 @@ def view_hobby(request):
         )
         return JsonResponse(new_hobby.__str___(),status=201)
 
-
 def login_view(request):
     """
     Handle user login.
@@ -57,28 +56,27 @@ def home_view(request):
 def logout_view(request):
     logout(request)
     return render(request, "login.html")
-    # Redirect to a success page.
 
 def signup_view(request):
     """
     Handle user signup and account creation.
     """
     if request.method == "POST":
-        print("Received POST request with data:", request.POST)  # Log incoming POST data
+        print("Received POST request with data:", request.POST)  
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()  # Save the new user
             login(request, user)  # Log in the user
             return redirect("http://localhost:5173/")
         else:
-            return render(request, "signup.html", {"form": form})  # Re-render with errors
+            return render(request, "signup.html", {"form": form})  
 
-    print("Rendering signup form for GET request.")  # Log GET request
+    print("Rendering signup form for GET request.") 
     form = CustomUserCreationForm()
     return render(request, "signup.html", {"form": form})
 
 def user_view(request):
-    if request.method == 'GET':
+    if request.method == 'GET': 
         User = get_user_model()
         all_users = User.objects.all()
         user_list = [x.to_dict() for x in all_users]
@@ -103,18 +101,33 @@ def user_list_view(request):
 
         user_list = [x.to_dict_user_list() for x in page_object]
         return JsonResponse(user_list, safe=False)
-
-
+    
+@csrf_exempt
 @login_required
 def current_user_view(request):
-    if request.user.is_authenticated:
-        user_data = {
-            "id": request.user.id,
-            "username": request.user.username,
-            "email": request.user.email,
-            "DOB": getattr(request.user, "DOB", None),
-            "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
-        }
-        return JsonResponse(user_data)
-    else:
-        return JsonResponse({"error": "User is not authenticated"}, status=401)
+    if request.method == "PUT": 
+        try:
+            data = json.loads(request.body)
+
+            
+            user = request.user
+            user.username = data.get("username", user.username)
+            user.email = data.get("email", user.email)
+            user.DOB = data.get("DOB", user.DOB)
+            if hasattr(user, "set_hobbies"):
+                user.set_hobbies(data.get("hobbies", []))
+            
+            user.save()
+            return JsonResponse({"message": "User updated successfully"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+
+    user_data = {
+        "id": request.user.id,
+        "username": request.user.username,
+        "email": request.user.email,
+        "DOB": getattr(request.user, "DOB", None),
+        "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
+    }
+    return JsonResponse(user_data)

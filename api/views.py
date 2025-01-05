@@ -5,7 +5,7 @@ from .models import Hobby, User
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.utils import timezone
 from datetime import timedelta
@@ -18,19 +18,71 @@ import json
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
-
-def view_hobby(request):
-    if request.method == 'GET':
-        all_hobbies = Hobby.objects.all()
-        hobby_list = [x.__str__() for x in all_hobbies]
-        return JsonResponse(hobby_list,safe=False)
-    
-    elif request.method == 'POST':
+@csrf_exempt
+def add_user_hobby(request):
+    try:
         data = json.loads(request.body)
-        new_hobby = Hobby.object.create(
-            hobby_name = data['hobby_name']
-        )
-        return JsonResponse(new_hobby.__str___(),status=201)
+        user = request.user
+        
+        if not user.is_authenticated:
+            return JsonResponse({"error": "User not authenticated"}, status=401)
+            
+        hobby_id = data.get('hobby_id')
+        if not hobby_id:
+            return JsonResponse({"error": "Hobby ID is required"}, status=400)
+            
+        try:
+            hobby = Hobby.objects.get(id=hobby_id)
+        except Hobby.DoesNotExist:
+            return JsonResponse({"error": "Hobby not found"}, status=404)
+
+        user.Hobbies.add(hobby)
+        return JsonResponse({
+            "message": "Hobby added successfully",
+            "hobby": {"id": hobby.id, "hobby_name": hobby.hobby_name}
+        }, status=201)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+@login_required
+def add_hobby_to_db(request):
+    """
+    Adds a new hobby to the hobbies database.
+    """
+    try:
+        data = json.loads(request.body)
+        hobby_name = data.get('hobby_name')
+
+        if not hobby_name:
+            return JsonResponse({"error": "Hobby name is required"}, status=400)
+
+        # Check if the hobby already exists, create it if not
+        hobby, created = Hobby.objects.get_or_create(hobby_name=hobby_name)
+
+        if not created:
+            return JsonResponse({"message": "Hobby already exists."}, status=200)
+
+        return JsonResponse({
+            "message": "Hobby added to the database successfully.",
+            "hobby": {"id": hobby.id, "hobby_name": hobby.hobby_name},
+        }, status=201)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+def displayhobbies(request):
+    if request.method == 'GET':
+        # Fetch all hobbies from the database
+        all_hobbies = Hobby.objects.all()
+        hobby_list = [{'id': hobby.id, 'hobby_name': hobby.hobby_name} for hobby in all_hobbies]
+        return JsonResponse(hobby_list, safe=False)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def login_view(request):
     """
@@ -131,3 +183,35 @@ def current_user_view(request):
         "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
     }
     return JsonResponse(user_data)
+
+@csrf_exempt
+@login_required
+def remove_user_hobby(request):
+    """
+    Removes a hobby from the user's hobbies list.
+    """
+    try:
+        data = json.loads(request.body)
+        user = request.user
+
+        hobby_name = data.get('hobby_name')
+        if not hobby_name:
+            return JsonResponse({"error": "Hobby name is required"}, status=400)
+
+        # Fetch the hobby object by its name
+        try:
+            hobby = Hobby.objects.get(hobby_name=hobby_name)
+        except Hobby.DoesNotExist:
+            return JsonResponse({"error": "Hobby not found"}, status=404)
+
+        # Remove the hobby from the user's Hobbies relationship
+        user.Hobbies.remove(hobby)
+
+        return JsonResponse({
+            "message": "Hobby removed successfully.",
+            "hobby_name": hobby_name,
+        }, status=200)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

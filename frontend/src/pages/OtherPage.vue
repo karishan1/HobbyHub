@@ -19,7 +19,8 @@
             <div class="div-2">
               <p>Hobbies:</p>
               <ul class="hobby-container">
-                <li class="hobby-box"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
+                <li class="hobby-box" v-if="user.hobbies.length > 0"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
+                <li v-else class="hobby-box" style="background-color: red;">No hobbies </li>
               </ul>
             </div>
         </li>
@@ -182,7 +183,7 @@
     padding-right: 1rem;
     border-radius: 0.3rem;
     align-self: center;
-    background-color: #057BFF;
+    background-color: #03c071;
   }
 
   .name{

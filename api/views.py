@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
-from .models import Hobby
+from .models import Hobby, User
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-
+from django.views.decorators.csrf import csrf_exempt
 
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -31,7 +31,6 @@ def view_hobby(request):
             hobby_name = data['hobby_name']
         )
         return JsonResponse(new_hobby.__str___(),status=201)
-
 
 def login_view(request):
     """
@@ -77,7 +76,7 @@ def signup_view(request):
     return render(request, "signup.html", {"form": form})
 
 def user_view(request):
-    if request.method == 'GET':
+    if request.method == 'GET': 
         User = get_user_model()
         all_users = User.objects.all()
         user_list = [x.to_dict() for x in all_users]
@@ -102,50 +101,33 @@ def user_list_view(request):
 
         user_list = [x.to_dict_user_list() for x in page_object]
         return JsonResponse(user_list, safe=False)
-
-
+    
+@csrf_exempt
 @login_required
 def current_user_view(request):
-    if request.user.is_authenticated:
-        if request.method == "PUT":
-            try:
-                data = json.loads(request.body)
-                
-                user = request.user
-                if "username" in data:
-                    user.username = data["username"]
-                if "email" in data:
-                    user.email = data["email"]
-                if "DOB" in data:
-                    user.DOB = data["DOB"]  
-                if "hobbies" in data:
-                    if hasattr(user, "set_hobbies"):  
-                        user.set_hobbies(data["hobbies"])
-                
-                user.save()
-                user_data = {
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "DOB": getattr(user, "DOB", None),
-                    "hobbies": getattr(user, "get_hobbies", lambda: [])(),
-                }
-                return JsonResponse(user_data)
+    if request.method == "PUT": 
+        try:
+            data = json.loads(request.body)
+
             
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Invalid JSON data"}, status=400)
-            except Exception as e:
-                return JsonResponse({"error": str(e)}, status=500)
+            user = request.user
+            user.username = data.get("username", user.username)
+            user.email = data.get("email", user.email)
+            user.DOB = data.get("DOB", user.DOB)
+            if hasattr(user, "set_hobbies"):
+                user.set_hobbies(data.get("hobbies", []))
+            
+            user.save()
+            return JsonResponse({"message": "User updated successfully"})
 
-        user_data = {
-            "id": request.user.id,
-            "username": request.user.username,
-            "email": request.user.email,
-            "DOB": getattr(request.user, "DOB", None),
-            "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
-        }
-        return JsonResponse(user_data)
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
 
-    else:
-        return JsonResponse({"error": "User is not authenticated"}, status=401)
-    
+    user_data = {
+        "id": request.user.id,
+        "username": request.user.username,
+        "email": request.user.email,
+        "DOB": getattr(request.user, "DOB", None),
+        "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
+    }
+    return JsonResponse(user_data)

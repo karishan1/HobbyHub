@@ -66,7 +66,7 @@
 
           <!-- Display User Info -->
           <div v-else>
-            <p><span class="label">Username:</span> {{ user.username }}</p>
+            <p><span class="label">Username:</span> {{ userStore.username }}</p>
             <p><span class="label">Email:</span> {{ user.email }}</p>
             <p><span class="label">DOB:</span> {{ user.DOB }}</p>
             <button @click="editDetails" class="edit-btn">Edit Details</button>
@@ -91,6 +91,8 @@
   </template>
 
   <script>
+  import { useUserStore } from '../stores/userStore';
+
   export default {
     name: "MainPage",
     data() {
@@ -114,6 +116,11 @@
         formError: null,
       };
     },
+    computed: {
+        userStore(){
+            return useUserStore();
+        }
+    },
     methods: {
       fetchUser() {  // Fetches current user data
         fetch("http://127.0.0.1:8000/api/current-user/", {
@@ -128,6 +135,7 @@
           })
           .then((data) => {
             this.user = data;
+                      this.userStore.setUser(data.id, data.username, data.hobbies);
           })
           .catch((error) => {
             this.error = error.message;

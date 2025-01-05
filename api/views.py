@@ -85,7 +85,9 @@ def user_view(request):
 def user_list_view(request):
     if request.method == 'GET':
         User = get_user_model()
-        all_users = User.objects.all()
+
+        logged_user = request.user
+        all_users = User.objects.exclude(id = logged_user.id)
 
         min_age = request.GET.get('min_age',None)
         max_age = request.GET.get('max_age',None)

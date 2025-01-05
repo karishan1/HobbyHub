@@ -13,11 +13,6 @@
         <main class="main-content">
             <RouterView />
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2025 HobbyHub</p>
-        </footer>
     </div>
 </template>
 
@@ -81,28 +76,7 @@ body {
     color: #007bff;
 }
 
-/* Main Content */
-.main-content {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
 
-/* Footer */
-.footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.9rem;
-    margin-top: auto;
-}
 
-.footer p {
-    margin: 0;
-}
+
 </style>

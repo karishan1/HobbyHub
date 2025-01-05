@@ -1,5 +1,14 @@
 <template>
     <div class="list-container">
+      <div>
+        <label>Min age:</label>
+        <input type="number" id="min_age" v-model.number="minAge"/>
+
+        <label>Max age:</label>
+        <input type="number" id="max_age" v-model.number="maxAge"/>
+
+        <button @click="filterByAge">Filter</button>
+      </div>
       <ul>
         <li class="user-container"  v-for="user in user_arr"   :key="user.id" >
             <div class="div-1">
@@ -35,6 +44,8 @@
               return {
                   title: "Other Page",
                   user_arr: [] as User[],
+                  minAge: 0,
+                  maxAge: 100,
               }
           },
           setup(){
@@ -54,7 +65,13 @@
           },
           methods:{
             async fetch_users(){
-              fetch("http://127.0.0.1:8000/user_list/", {
+
+              const url = new URL("http://127.0.0.1:8000/user_list/");
+
+              if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
+              if (this.maxAge) url.searchParams.append("max_age", this.maxAge.toString());
+
+              fetch(url.toString(), {
                   method: "GET",
                   credentials: "include", 
                 })
@@ -103,6 +120,10 @@
               return user_arr
             },
 
+            filterByAge(){
+              this.fetch_users();
+            }
+
 
           },
           mounted(){
@@ -115,11 +136,13 @@
 
   .list-container{
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     width: 100vw;
     height: 100vh;
-    margin-top: 10rem; 
+    margin-top: 1rem; 
+    gap: 2rem;
   }
   ul{
     display: flex;

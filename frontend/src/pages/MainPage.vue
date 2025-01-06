@@ -56,7 +56,7 @@
         <div v-else>
           <p><span class="label">Username:</span> {{ user.username }}</p>
           <p><span class="label">Email:</span> {{ user.email }}</p>
-          <p><span class="label">DOB:</span> {{ user.DOB }}</p>
+          <p><span class="label">DOB:</span> {{ user.DOB }} </p>
           <button @click="editDetails" class="edit-btn">Edit Details</button>
         </div>
       </div>
@@ -196,9 +196,8 @@ export default defineComponent({
         const hobby = this.availableHobbies.find((h) => h.id === hobbyId);
         if (hobby && !this.user.hobbies.includes(hobby.hobby_name)) {
           this.user.hobbies.push(hobby.hobby_name);
+          this.fetchUser();
         }
-
-        alert("Hobby added successfully!");
       } catch (error) {
         console.error("Error adding existing hobby:", error);
       }
@@ -227,7 +226,6 @@ export default defineComponent({
           throw new Error(`Failed to add new hobby to the database: ${response.status}`);
         }
 
-        alert("Hobby added to the database successfully!");
         this.newHobbyName = "";
         await this.fetchHobbies();
       } catch (error) {
@@ -254,8 +252,8 @@ export default defineComponent({
         }
 
         this.user.hobbies = this.user.hobbies.filter((hobby) => hobby !== hobbyName);
+        this.fetchUser();
 
-        alert("Hobby removed successfully!");
       } catch (error) {
         console.error("Error removing hobby:", error);
       }

@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
-from .models import Hobby, User
+from .models import Hobby, User, FriendRequest
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -220,3 +220,29 @@ def current_user_view(request):
         "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
     }
     return JsonResponse(user_data)
+
+@csrf_exempt
+def send_friend_request(request):
+            
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            from_user = request.user
+            to_user_id = data.get("to_friend_id")
+            to_user = User.objects.get(id = to_user_id)
+
+            if FriendRequest.objects.filter(from_user = from_user, to_user = to_user).exists():
+                return JsonResponse({"message" : "Already Sent"}, status = 400)
+
+            FriendRequest.objects.create(from_user = from_user, to_user=to_user)
+            return JsonResponse({"message" : "Friend Request Sent"})
+            
+        except User.DoesNotExist:
+            return JsonResponse({"message" : " User Does Not Exists"}, status = 404)
+        
+        except Exception as e:
+            return JsonResponse({"message" : str(e)}, status = 500)
+        
+    return JsonResponse({"message" : " Invalid Request"}, status = 405)
+
+

@@ -20,13 +20,13 @@
               <p>Name:</p>
               <p class="name">{{ user.username }}</p>
             </div>
-            <button class="add_button">Add Friend</button>
+            <button class="add_button" @click="sendFriendRequest(user.id)">Add Friend</button>
           </div>
           <div class="div-2">
             <p>Hobbies:</p>
             <ul class="hobby-container">
               <li class="hobby-box" v-if="user.hobbies.length > 0"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
-              <li v-else class="hobby-box" style="background-color: red;">No hobbies </li>
+              <li v-else class="hobby-box" style="background-color: #d80606;">No hobbies </li>
             </ul>
           </div>
       </li>
@@ -127,10 +127,36 @@
 
             return user_arr
           },
-
           filterByAge(){
             this.fetch_users();
+          },
+          async sendFriendRequest(friend_id : string){
+            const url = "http://127.0.0.1:8000/send_friend_request/";
+
+            try{
+              const response = await fetch(url,{
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({to_friend_id: friend_id}),
+              });
+
+              if (response.ok){
+                alert(`Friend request sent to ${friend_id}`);
+              }
+              else{
+                const error = await response.json();
+                alert(`${error.message}`);
+
+              }
+            }
+            catch(error) {
+              alert(`Error`);
+            }
           }
+
 
 
         },

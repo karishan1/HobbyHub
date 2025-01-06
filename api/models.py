@@ -60,6 +60,7 @@ class FriendRequest(models.Model):
     # Allows Friend requests to be sent from one user to another
     from_user = models.ForeignKey(User,on_delete = models.CASCADE, related_name='friend_request_sent')
     to_user = models.ForeignKey(User,on_delete = models.CASCADE, related_name='friend_request_received')
+    status = models.CharField(max_length=10, choices=[('pending','Pending'),('accepted','Accepted')], default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -67,6 +68,9 @@ class FriendRequest(models.Model):
 
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
+    
+    def getStatus(self):
+        return self.status
 
 
 # idk what this is it was created before 

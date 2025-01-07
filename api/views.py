@@ -248,20 +248,27 @@ def send_friend_request(request):
 
         friend_request_list = FriendRequest.objects.filter(to_user = to_user)
 
-        serialized_friend_request_list = [
-            {
-                "from_user_id": x.from_user.id,
-                "from_user_username": x.from_user.username,
-                "status": x.status,
-                "to_user_username" : x.to_user.username
-            }
-            for x in friend_request_list
-        ]
+        friend_request_list = [x.to_dict() for x in friend_request_list]
+
+        return JsonResponse(friend_request_list, safe=False)
+    
+    elif request.method == "PUT":
+        try:
+            to_user = request.user
+            data = json.loads(request.body)
+            request_id = data.get("request_id")
+
+            friend_request = FriendRequest.objects.filter(id = request_id, to_user = to_user).first()
+
+            friend_request.status = "accepted"
+            friend_request.save()
+            return JsonResponse({"message" : "Friend Request Accepted"})
 
 
+        except User.DoesNotExist:
+            return JsonResponse({"message" : " User Does Not Exists"}, status = 404)
 
 
-        return JsonResponse(serialized_friend_request_list, safe=False)
         
     return JsonResponse({"message" : " Invalid Request"}, status = 405)
 

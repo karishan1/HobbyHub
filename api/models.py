@@ -58,6 +58,7 @@ class Friendship(models.Model):
     
 class FriendRequest(models.Model):
     # Allows Friend requests to be sent from one user to another
+
     from_user = models.ForeignKey(User,on_delete = models.CASCADE, related_name='friend_request_sent')
     to_user = models.ForeignKey(User,on_delete = models.CASCADE, related_name='friend_request_received')
     status = models.CharField(max_length=10, choices=[('pending','Pending'),('accepted','Accepted')], default='pending')
@@ -69,6 +70,14 @@ class FriendRequest(models.Model):
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
     
+    def to_dict(self):
+        return {
+            "id" : self.id,
+            "from_user_id": self.from_user.id,
+            "from_user_username": self.from_user.username,
+            "status": self.status,
+            "to_user_username" : self.to_user.username
+            }
     
 
 

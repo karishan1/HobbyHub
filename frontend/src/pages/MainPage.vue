@@ -10,7 +10,6 @@
       <!-- User Information Blob -->
       <div class="blob user-info">
         <h2>User Information</h2>
-
         <!-- Editable Form -->
         <div v-if="isEditing">
           <!-- Toggle Between Details and Password Form -->
@@ -48,7 +47,7 @@
             <input type="date" v-model="editedUser.DOB" class="input" />
             <button @click="saveDetails" class="save-btn">Save</button>
             <button @click="cancelEdit" class="cancel-btn">Cancel</button>
-            <button @click="togglePasswordChange" class="edit-btn">Change Password</button>
+            <button @click="togglePasswordChange" class="edit-btn-1">Change Password</button>
           </div>
         </div>
 
@@ -58,6 +57,7 @@
           <p><span class="label">Email:</span> {{ user.email }}</p>
           <p><span class="label">DOB:</span> {{ user.DOB }} </p>
           <button @click="editDetails" class="edit-btn">Edit Details</button>
+          <button @click="showRequestsModal = true" class="show-requests">Show Friend Requests</button>
         </div>
       </div>
 
@@ -91,10 +91,24 @@
         <button @click="showHobbiesModal = false" class="cancel-btn">Close</button>
       </div>
     </div>
-
-    <div v-else class="loading">
-      <p>Loading user data...</p>
+    <div v-if="showRequestsModal == true" class="modal">
+      <div class="modal-content-requests">
+        <h4 style="margin-top: 1rem;">Pending Freind Requests</h4>
+        <div class="modal-request-container">
+          <ul v-if="friendRequests.length > 0">
+            <li v-for="x in friendRequests" :key="x.id" >
+              <div v-if="x.status == 'pending'">
+                <p>Friend request from  {{ x.from_user_username }}</p>
+                <button class="accept" @click="acceptRequest(x.id)">Accept</button>
+              </div>
+            </li>
+          </ul>
+          <div v-else  class="no-requests"> No Friend Requests</div>
+        </div>
+        <button @click="showRequestsModal = false" class="close-request-modal">Close</button>
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -113,6 +127,12 @@ interface User {
   DOB: string;
   hobbies: string[];
 }
+interface FriendRequest {
+  id : number,
+  from_user_id : number,
+  from_user_username : string,
+  status : string
+}
 
 export default defineComponent({
   name: "MainPage",
@@ -123,6 +143,7 @@ export default defineComponent({
       user: {} as User,
       editedUser: {} as User,
       availableHobbies: [] as Hobby[],
+      friendRequests: [] as FriendRequest[],
       newHobbyName: "",
       passwordForm: {
         oldPassword: "",
@@ -134,6 +155,7 @@ export default defineComponent({
       error: null as string | null,
       formError: null as string | null,
       showHobbiesModal: false,
+      showRequestsModal: false,
     };
   },
   computed: {
@@ -142,25 +164,75 @@ export default defineComponent({
         }
     },
   methods: {
-    fetchUser() {  // Fetches current user data
-        fetch("http://127.0.0.1:8000/api/current-user/", {
-          method: "GET",
+    async fetchUser() { 
+       // Fetches current user data
+      fetch("http://127.0.0.1:8000/api/current-user/", {
+        method: "GET",
+        credentials: "include",
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        this.user = data;
+        this.userStore.setUser(data.id, data.username, data.hobbies);
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
+    },
+    async fetchRequests(){
+      fetch("http://127.0.0.1:8000/send_friend_request/", {
+        method: "GET",
+        credentials: "include",
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        this.friendRequests = data;
+
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
+
+    },
+    async acceptRequest(id:number){
+      const url = "http://127.0.0.1:8000/send_friend_request/";
+
+      try{
+        const response = await fetch(url,{
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            this.user = data;
-                      this.userStore.setUser(data.id, data.username, data.hobbies);
-          })
-          .catch((error) => {
-            this.error = error.message;
-          });
-      },
+          body: JSON.stringify({request_id: id}),
+        });
+
+        if (response.ok){
+          this.fetchRequests();
+          alert(`Friend request accepted`);
+          
+        }
+        else{
+          const error = await response.json();
+          alert(`${error.message}`);
+
+        }
+      }
+      catch(error) {
+        alert(`Error`);
+      }
+    },
+
     async fetchHobbies() {
       try {
         const response = await fetch("http://127.0.0.1:8000/display_hobby/", {
@@ -304,6 +376,7 @@ export default defineComponent({
         confirmPassword: "",
       };
     },
+    
     async changePassword() {
       // Implement the password change logic here
       // For example, you might want to send a request to the server
@@ -313,6 +386,7 @@ export default defineComponent({
   created() {
     this.fetchUser();
     this.fetchHobbies();
+    this.fetchRequests();
   },
 });
 </script>
@@ -393,6 +467,17 @@ export default defineComponent({
     border-radius: 5px;
     cursor: pointer;
     margin-top: 1rem;
+  }
+  .edit-btn-1{
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    margin-left: 8rem;
+
   }
 
   .save-btn {
@@ -499,6 +584,116 @@ export default defineComponent({
   padding: 0.5rem; /* Optional: Add some padding */
   border-radius: 5px; /* Optional: Add rounded corners */
 }
+.friend-request-container{
+  justify-self: flex-end;
+  background-color: #007bff;
+  width: 33rem;
+  height: 20rem;
+}
 
+.modal-content-requests{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: white;
+  border-radius: 1rem;
+  width: 40rem;
+  height: 30rem;
+  gap: 1rem;
+}
+.modal-request-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 21rem;
+  width: 35rem;
+
+}
+
+.modal-request-container ul{
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+
+  max-height: 22rem;
+  overflow-y: auto;
+}
+.modal-request-container li div{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 35rem;
+  height: 3.5rem;
+  margin-right: 2rem;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+.modal-request-container li div p{
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+  border-radius: 0.5rem;
+  height: 3rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  background-color: #007bff;
+  color: white;
+}
+.accept{
+  border: none;
+  height: 3rem;
+  width: 6rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+  background-color: #0aa32e;
+  color: white;
+  font-size: 1rem;
+}
+.accept:hover{
+  background-color: #05c732;
+  transition: ease 0.3s;
+}
+.close-request-modal{
+  background-color: #c82333;
+  color: white;
+  align-self: flex-end;
+  margin-right: 2rem;
+  border: none;
+  width: 5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+}
+.close-request-modal:hover{
+  background-color: #f02b3e;
+  transition: ease 0.1s;
+
+}
+.no-requests{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 7rem;
+  background-color: #b5b5b5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+  width: 20rem;
+  height: 6rem;
+  color: white;
+  font-size: 1.4rem;
+  border-radius: 0.7rem;
+}
+.show-requests{
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-left: 9rem;
+}
 
 </style>

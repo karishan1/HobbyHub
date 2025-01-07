@@ -242,6 +242,33 @@ def send_friend_request(request):
         
         except Exception as e:
             return JsonResponse({"message" : str(e)}, status = 500)
+    
+    elif request.method == "GET":
+        to_user = request.user
+
+        friend_request_list = FriendRequest.objects.filter(to_user = to_user)
+
+        friend_request_list = [x.to_dict() for x in friend_request_list]
+
+        return JsonResponse(friend_request_list, safe=False)
+    
+    elif request.method == "PUT":
+        try:
+            to_user = request.user
+            data = json.loads(request.body)
+            request_id = data.get("request_id")
+
+            friend_request = FriendRequest.objects.filter(id = request_id, to_user = to_user).first()
+
+            friend_request.status = "accepted"
+            friend_request.save()
+            return JsonResponse({"message" : "Friend Request Accepted"})
+
+
+        except User.DoesNotExist:
+            return JsonResponse({"message" : " User Does Not Exists"}, status = 404)
+
+
         
     return JsonResponse({"message" : " Invalid Request"}, status = 405)
 

@@ -242,6 +242,26 @@ def send_friend_request(request):
         
         except Exception as e:
             return JsonResponse({"message" : str(e)}, status = 500)
+    
+    elif request.method == "GET":
+        to_user = request.user
+
+        friend_request_list = FriendRequest.objects.filter(to_user = to_user)
+
+        serialized_friend_request_list = [
+            {
+                "from_user_id": x.from_user.id,
+                "from_user_username": x.from_user.username,
+                "status": x.status,
+                "to_user_username" : x.to_user.username
+            }
+            for x in friend_request_list
+        ]
+
+
+
+
+        return JsonResponse(serialized_friend_request_list, safe=False)
         
     return JsonResponse({"message" : " Invalid Request"}, status = 405)
 

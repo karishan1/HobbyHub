@@ -69,8 +69,7 @@ class FriendRequest(models.Model):
     def __str__(self):
         return f"Friend Request from {self.from_user} to {self.to_user}"
     
-    def getStatus(self):
-        return self.status
+    
 
 
 # idk what this is it was created before 

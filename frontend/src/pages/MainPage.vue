@@ -1,5 +1,9 @@
 <template>
   <div class="mainpage-container">
+    <div class="logout-container">
+      <!-- Logout Button-->
+      <button @click="logout" class="logout-btn">Logout</button>
+    </div>
     <h1 class="title">{{ title }}</h1>
 
     <div v-if="error" class="error">
@@ -73,41 +77,41 @@
         <button @click="showHobbiesModal = true" class="edit-btn">Edit Hobbies</button>
       </div>
     </div>
+    
+      <div v-if="showHobbiesModal" class="modal">
+        <div class="modal-content">
+          <h4>Add a New Hobby to the Database</h4>
+          <input v-model="newHobbyName" placeholder="Type new hobby name..." />
+          <button @click="addNewHobby" class="add-btn">Add Hobby</button>
 
-    <div v-if="showHobbiesModal" class="modal">
-      <div class="modal-content">
-        <h4>Add a New Hobby to the Database</h4>
-        <input v-model="newHobbyName" placeholder="Type new hobby name..." />
-        <button @click="addNewHobby" class="add-btn">Add Hobby</button>
-
-        <h4>Available Hobbies</h4>
-        <ul>
-          <li v-for="hobby in availableHobbies" :key="hobby.id" class="hobby-item">
-            {{ hobby.hobby_name }}
-            <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
-          </li>
-        </ul>
-
-        <button @click="showHobbiesModal = false" class="cancel-btn">Close</button>
-      </div>
-    </div>
-    <div v-if="showRequestsModal == true" class="modal">
-      <div class="modal-content-requests">
-        <h4 style="margin-top: 1rem;">Pending Freind Requests</h4>
-        <div class="modal-request-container">
-          <ul v-if="friendRequests.length > 0">
-            <li v-for="x in friendRequests" :key="x.id" >
-              <div v-if="x.status == 'pending'">
-                <p>Friend request from  {{ x.from_user_username }}</p>
-                <button class="accept" @click="acceptRequest(x.id)">Accept</button>
-              </div>
+          <h4>Available Hobbies</h4>
+          <ul>
+            <li v-for="hobby in availableHobbies" :key="hobby.id" class="hobby-item">
+              {{ hobby.hobby_name }}
+              <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
             </li>
           </ul>
-          <div v-else  class="no-requests"> No Friend Requests</div>
+
+          <button @click="showHobbiesModal = false" class="cancel-btn">Close</button>
         </div>
-        <button @click="showRequestsModal = false" class="close-request-modal">Close</button>
       </div>
-    </div>
+      <div v-if="showRequestsModal == true" class="modal">
+        <div class="modal-content-requests">
+          <h4 style="margin-top: 1rem;">Pending Freind Requests</h4>
+          <div class="modal-request-container">
+            <ul v-if="friendRequests.length > 0">
+              <li v-for="x in friendRequests" :key="x.id" >
+                <div v-if="x.status == 'pending'">
+                  <p>Friend request from  {{ x.from_user_username }}</p>
+                  <button class="accept" @click="acceptRequest(x.id)">Accept</button>
+                </div>
+              </li>
+            </ul>
+            <div v-else  class="no-requests"> No Friend Requests</div>
+          </div>
+          <button @click="showRequestsModal = false" class="close-request-modal">Close</button>
+        </div>
+      </div>
 
   </div>
 </template>
@@ -358,6 +362,16 @@ export default defineComponent({
         this.formError = error instanceof Error ? error.message : String(error);
       }
     },
+    logout() {
+      fetch('/logout/', {
+        method: 'GET',
+        credentials: 'include',
+      }).then(() => {
+        window.location.href = 'http://127.0.0.1:8000/'; // Redirect to the login page
+      }).catch(error => {
+        console.error('Error logging out:', error);
+      });
+    },
 
     cancelEdit() {
       this.isEditing = false;
@@ -399,6 +413,7 @@ export default defineComponent({
     margin: 2rem auto;
     padding: 1rem;
     font-family: Arial, sans-serif;
+    position: relative;
   }
 
   /* Title */
@@ -694,6 +709,22 @@ export default defineComponent({
   cursor: pointer;
   margin-top: 1rem;
   margin-left: 9rem;
+}
+.logout-btn {
+  background-color: #dc3545; 
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  opacity: 0.8;
+}
+.logout-container {
+  position: absolute; 
+  top: 10px; 
+  right: -80px; 
 }
 
 </style>

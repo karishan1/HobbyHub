@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib.auth import login, logout, authenticate, get_user_model, update_session_auth_hash
 from django.shortcuts import render, redirect
 from .models import Hobby, User, FriendRequest, Friendship
 from .forms import CustomUserCreationForm
@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from datetime import timedelta
 from django.utils.timezone import now
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 import json
 from django.middleware.csrf import get_token
 from django.db import IntegrityError
@@ -328,6 +328,22 @@ def friendship_view(request):
 
         return JsonResponse(friendship_list, safe=False)
 
+def change_password_view(request):
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
 
+            form = PasswordChangeForm(user=request.user, data=data)
 
+            if form.is_valid():
+                user = form.save()
 
+                update_session_auth_hash(request, user)
+                return JsonResponse({"message": "Password changed successfully!"})
+            else:
+                print("Form Errors:", form.errors) 
+                return JsonResponse({"errors": form.errors}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON data."}, status=400)
+
+    return JsonResponse({"message": "Invalid request method."}, status=405)

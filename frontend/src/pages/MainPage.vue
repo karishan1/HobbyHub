@@ -19,23 +19,18 @@
           <!-- Toggle Between Details and Password Form -->
           <div v-if="isChangingPassword">
             <label class="label">Old Password:</label>
-            <input
-              type="password"
-              v-model="passwordForm.oldPassword"
-              class="input"
-            />
+            <input type="password" v-model="passwordForm.oldPassword" class="input" />
+
+            <p v-if="formErrors.old_password" class="form-error">{{ formErrors.old_password[0] }}</p>
+
             <label class="label">New Password:</label>
-            <input
-              type="password"
-              v-model="passwordForm.newPassword"
-              class="input"
-            />
+            <input type="password" v-model="passwordForm.newPassword" class="input" />
+
             <label class="label">Confirm New Password:</label>
-            <input
-              type="password"
-              v-model="passwordForm.confirmPassword"
-              class="input"
-            />
+            <input type="password" v-model="passwordForm.confirmPassword" class="input" />
+
+            <p v-if="formErrors.new_password2" class="form-error">{{ formErrors.new_password2[0] }}</p>
+
             <button @click="changePassword" class="save-btn">Change Password</button>
             <button @click="cancelPasswordChange" class="cancel-btn">Cancel</button>
           </div>
@@ -160,6 +155,7 @@ export default defineComponent({
       formError: null as string | null,
       showHobbiesModal: false,
       showRequestsModal: false,
+      formErrors: {} as { [key: string]: string[] },
       csrfToken: "",
     };
   },
@@ -411,11 +407,45 @@ export default defineComponent({
     },
     
     async changePassword() {
-      // Implement the password change logic here
-      // For example, you might want to send a request to the server
-      // to update the user's password using the values in passwordForm.
+        this.formErrors = {}; // Reset errors
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/change-password/", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": this.csrfToken,
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              old_password: this.passwordForm.oldPassword,
+              new_password1: this.passwordForm.newPassword,
+              new_password2: this.passwordForm.confirmPassword,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            if (errorData.errors) {
+              this.formErrors = errorData.errors; 
+            } else {
+              alert("An error occurred while changing the password.");
+            }
+            return;
+          }
+
+          alert("Password changed successfully!");
+          this.cancelPasswordChange();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again.");
+        }
+      }
+
+
+
     },
-  },
+
   async mounted() {
     await this.fetch_csrf_token();
     this.fetchUser();
@@ -745,6 +775,12 @@ export default defineComponent({
   position: absolute; 
   top: 10px; 
   right: -80px; 
+}
+
+.form-error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
 }
 
 </style>

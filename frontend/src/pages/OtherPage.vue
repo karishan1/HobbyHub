@@ -21,7 +21,7 @@
               <p class="name">{{ user.username }}</p>
             </div>
             <button v-if="!friend_list.includes(user.id ?? 0)" class="add_button" @click="sendFriendRequest(user.id ?? 0)">Add Friend</button>
-            <button v-else class="add_button" style="background-color: #007BFF;">Friend</button>
+            <button v-else class="add_button" disabled style="background-color: #007BFF;">Friend</button>
           </div>
           <div class="div-2">
             <p>Hobbies:</p>
@@ -31,6 +31,10 @@
             </ul>
           </div>
       </li>
+      <div class="paginator-container">
+        <button class="page-button" :disabled="!hasPrevious" @click="fetch_users(currentPage -1)">Previous</button>
+        <button class="page-button" :disabled="!hasNext" @click="fetch_users(currentPage + 1)">Next</button>
+      </div>
     </ul>
   </div>
 
@@ -61,6 +65,11 @@
                 minAge: 0,
                 maxAge: 100,
                 csrfToken: "",
+                currentPage: 1,
+                totalPages: 1,
+                hasNext: false,
+                hasPrevious: false,
+
             }
         },
         setup(){
@@ -118,10 +127,11 @@
               alert(error.message);
             });
           },
-          async fetch_users(){
+          async fetch_users(page = 1){
 
             const url = new URL("http://127.0.0.1:8000/user_list/");
 
+            url.searchParams.append("page", page.toString());
             if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
             if (this.maxAge) url.searchParams.append("max_age", this.maxAge.toString());
 
@@ -129,51 +139,24 @@
                 method: "GET",
                 credentials: "include", 
               })
-                .then((response) => {
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                  }
-                  return response.json();
-                })
-                .then((data) => {
-                  this.user_arr = data; 
-                  this.user_arr = this.mostCommonHobbies(this.user_arr,this.local_user);
-
-                })
-                .catch((error) => {
-                  error = error.message; 
-                });
-          },
-          mostCommonHobbies(user_arr: User[], local_user: User): User[]{
-            function getCommonHobbyCount(user_hobbies : string[], local_user_hobbies : string[]): number{
-              let commonHobbyCount: number = 0;
-
-              for (let x of user_hobbies){
-                for (let y of local_user_hobbies){
-                  if (x === y){
-                    commonHobbyCount += 1;
-                    break;
-                  }
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
                 }
-              }
-              return commonHobbyCount;
-            }
-
-            for (let i = 0; i < user_arr.length; i++){
-              for (let j = i+1; j < user_arr.length; j++){
-                const commonHobbyCountA = getCommonHobbyCount(user_arr[i].hobbies,local_user.hobbies);
-                const commonHobbyCountB = getCommonHobbyCount(user_arr[j].hobbies,local_user.hobbies);
-
-                if (commonHobbyCountB > commonHobbyCountA){
-                  const cur = user_arr[i];
-                  user_arr[i] = user_arr[j];
-                  user_arr[j] = cur;
-                }
-              }
-            }
-
-            return user_arr
+                return response.json();
+              })
+              .then((data) => {
+                this.user_arr = data.user_list; 
+                this.currentPage = data.current_page;
+                this.totalPages = data.total_pages;
+                this.hasNext = data.has_next;
+                this.hasPrevious = data.has_previous;
+              })
+              .catch((error) => {
+                error = error.message; 
+              });
           },
+
           filterByAge(){
             this.fetch_users();
           },
@@ -217,6 +200,35 @@
 </script>
 
 <style scoped>
+
+.paginator-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+
+}
+.page-button{
+  border: none;
+  width: 10rem;
+  height: 2rem;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 0.3rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.page-button:hover{
+  background-color: #007bffa1;
+  transition: 0.3s ease;
+
+}
+
+.page-button:disabled{
+  background-color: white;
+  color: black;
+}
 
 .list-container{
   display: flex;

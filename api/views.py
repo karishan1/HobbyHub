@@ -14,12 +14,19 @@ from django.contrib.auth.forms import AuthenticationForm
 
 import json
 
+from django.middleware.csrf import get_token
+
+
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({"csrfToken": csrf_token})
+
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
 
-@csrf_exempt
+
 def add_user_hobby(request):
     try:
         data = json.loads(request.body)
@@ -48,7 +55,7 @@ def add_user_hobby(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-@csrf_exempt
+
 @login_required
 def add_hobby_to_db(request):
     """
@@ -86,7 +93,7 @@ def displayhobbies(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
 
-@csrf_exempt
+
 @login_required
 def remove_user_hobby(request):
     """
@@ -191,7 +198,7 @@ def user_list_view(request):
         user_list = [x.to_dict_user_list() for x in page_object]
         return JsonResponse(user_list, safe=False)
     
-@csrf_exempt
+
 @login_required
 def current_user_view(request):
     if request.method == "PUT": 
@@ -221,7 +228,7 @@ def current_user_view(request):
     }
     return JsonResponse(user_data)
 
-@csrf_exempt
+
 def send_friend_request(request):
             
     if request.method == "POST":

@@ -160,6 +160,7 @@ export default defineComponent({
       formError: null as string | null,
       showHobbiesModal: false,
       showRequestsModal: false,
+      csrfToken: "",
     };
   },
   computed: {
@@ -168,6 +169,27 @@ export default defineComponent({
         }
     },
   methods: {
+    async fetch_csrf_token(){
+      const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
+      try{
+        const response = await fetch(url,{
+          method: "GET",
+          credentials: "include", 
+        });
+
+        if (response.ok){
+          const data = await response.json();
+          this.csrfToken = data.csrfToken;
+          console.log(`Fetched csrf token: ${this.csrfToken}`);
+        }
+        else{
+          console.log(`Failed to fetch token, ${response.statusText}`)
+        }
+      }
+      catch (error){
+        console.error(`Error fetching token, ${error}`)
+      }
+    },
     async fetchUser() { 
        // Fetches current user data
       fetch("http://127.0.0.1:8000/api/current-user/", {
@@ -216,6 +238,7 @@ export default defineComponent({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRFToken": this.csrfToken,
           },
           credentials: "include",
           body: JSON.stringify({request_id: id}),
@@ -253,13 +276,12 @@ export default defineComponent({
 
     async addExistingHobby(hobbyId: number) {
       try {
-        const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
-
+ 
         const response = await fetch("http://127.0.0.1:8000/add_user_hobby/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
+            "X-CSRFToken": this.csrfToken,
           },
           body: JSON.stringify({ hobby_id: hobbyId }),
           credentials: "include",
@@ -284,15 +306,12 @@ export default defineComponent({
         alert("Hobby name cannot be empty.");
         return;
       }
-
       try {
-        const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
-
         const response = await fetch("http://127.0.0.1:8000/add_hobby_to_db/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
+            "X-CSRFToken": this.csrfToken,
           },
           body: JSON.stringify({ hobby_name: this.newHobbyName }),
           credentials: "include",
@@ -311,13 +330,12 @@ export default defineComponent({
 
     async removeHobby(hobbyName: string) {
       try {
-        const csrfToken = document.cookie.match(/csrftoken=([\w-]+)/)?.[1] || "";
 
         const response = await fetch("http://127.0.0.1:8000/remove_user_hobby/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
+            "X-CSRFToken": this.csrfToken,          
           },
           body: JSON.stringify({ hobby_name: hobbyName }),
           credentials: "include",
@@ -346,6 +364,7 @@ export default defineComponent({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRFToken": this.csrfToken,
           },
           credentials: "include",
           body: JSON.stringify(this.editedUser),
@@ -397,7 +416,8 @@ export default defineComponent({
       // to update the user's password using the values in passwordForm.
     },
   },
-  created() {
+  async mounted() {
+    await this.fetch_csrf_token();
     this.fetchUser();
     this.fetchHobbies();
     this.fetchRequests();

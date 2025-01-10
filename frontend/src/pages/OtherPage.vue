@@ -53,6 +53,7 @@
                 user_arr: [] as User[],
                 minAge: 0,
                 maxAge: 100,
+                csrfToken: "",
             }
         },
         setup(){
@@ -71,6 +72,27 @@
             },
         },
         methods:{
+          async fetch_csrf_token(){
+            const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
+            try{
+              const response = await fetch(url,{
+                method: "GET",
+                credentials: "include", 
+              });
+
+              if (response.ok){
+                const data = await response.json();
+                this.csrfToken = data.csrfToken;
+                console.log(`Fetched csrf token: ${this.csrfToken}`);
+              }
+              else{
+                console.log(`Failed to fetch token, ${response.statusText}`)
+              }
+            }
+            catch (error){
+              console.error(`Error fetching token, ${error}`)
+            }
+          },
           async fetch_users(){
 
             const url = new URL("http://127.0.0.1:8000/user_list/");
@@ -138,6 +160,7 @@
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
+                  "X-CSRFToken": this.csrfToken,
                 },
                 credentials: "include",
                 body: JSON.stringify({to_friend_id: friend_id}),
@@ -160,7 +183,8 @@
 
 
         },
-        mounted(){
+        async mounted(){
+          await this.fetch_csrf_token();
           this.fetch_users();
         }
     })

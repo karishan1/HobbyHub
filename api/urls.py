@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.http import HttpResponse
-from .views import login_view,home_view,logout_view,signup_view,user_view,user_list_view,current_user_view,add_user_hobby,displayhobbies,add_hobby_to_db,remove_user_hobby, friend_request_view, get_csrf_token, friendship_view
+from .views import login_view,home_view,logout_view,signup_view,user_view,user_list_view,current_user_view,add_user_hobby,displayhobbies,add_hobby_to_db,remove_user_hobby, friend_request_view, get_csrf_token, friendship_view, change_password_view
 
 
 
@@ -39,5 +39,6 @@ urlpatterns = [
     path("send_friend_request/", friend_request_view , name="send_friend_request"),
     path("friendships/", friendship_view , name="friendships"),
     path("get_csrf_token/", get_csrf_token, name="get_csrf_token"),
+    path("change-password/",change_password_view, name="password_change"),
     
 ]

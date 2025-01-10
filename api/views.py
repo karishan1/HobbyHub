@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model, update_session_auth_hash
 from django.shortcuts import render, redirect
 from .models import Hobby, User, FriendRequest, Friendship
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CustomUserUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from datetime import timedelta
@@ -225,32 +225,39 @@ def user_list_view(request):
 
 @login_required
 def current_user_view(request):
-    if request.method == "PUT": 
+    if request.method == "PUT":
         try:
+            # Parse the JSON payload
             data = json.loads(request.body)
 
-            
-            user = request.user
-            user.username = data.get("username", user.username)
-            user.email = data.get("email", user.email)
-            user.DOB = data.get("DOB", user.DOB)
-            if hasattr(user, "set_hobbies"):
-                user.set_hobbies(data.get("hobbies", []))
-            
-            user.save()
-            return JsonResponse({"message": "User updated successfully"})
+            # Use the form to validate and update user data
+            form = CustomUserUpdateForm(data, instance=request.user)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({"message": "User details updated successfully!"})
+            else:
+                # Return validation errors
+                print(form.errors)
+                return JsonResponse({"errors": form.errors}, status=400)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
-    user_data = {
+    elif request.method == "GET":
+        # Return current user data
+        user_data = {
         "id": request.user.id,
         "username": request.user.username,
         "email": request.user.email,
         "DOB": getattr(request.user, "DOB", None),
         "hobbies": getattr(request.user, "get_hobbies", lambda: [])(),
     }
-    return JsonResponse(user_data)
+        return JsonResponse(user_data)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
+
+    
+    
 
 @login_required
 def friend_request_view(request):

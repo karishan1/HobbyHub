@@ -38,16 +38,23 @@
           <div v-else>
             <label class="label">Username:</label>
             <input type="text" v-model="editedUser.username" class="input" />
-            <p v-if="formError" class="form-error">{{ formError }}</p>
+            <p v-if="formErrors.username" class="form-error">{{ formErrors.username[0] }}</p>
 
             <label class="label">Email:</label>
             <input type="email" v-model="editedUser.email" class="input" />
+            <p v-if="formErrors.email" class="form-error">{{ formErrors.email[0] }}</p>
+
             <label class="label">DOB:</label>
             <input type="date" v-model="editedUser.DOB" class="input" />
+            <p v-if="formErrors.DOB" class="form-error">{{ formErrors.DOB[0] }}</p>
+
+            <p v-if="formError" class="form-error">{{ formError }}</p>
+
             <button @click="saveDetails" class="save-btn">Save</button>
             <button @click="cancelEdit" class="cancel-btn">Cancel</button>
             <button @click="togglePasswordChange" class="edit-btn-1">Change Password</button>
           </div>
+
         </div>
 
         <!-- Display User Info -->
@@ -355,6 +362,9 @@ export default defineComponent({
     },
 
     async saveDetails() {
+      this.formErrors = {}; 
+      this.formError = null; 
+
       try {
         const response = await fetch("http://127.0.0.1:8000/api/current-user/", {
           method: "PUT",
@@ -367,7 +377,14 @@ export default defineComponent({
         });
 
         if (!response.ok) {
-          throw new Error("Failed to update user details.");
+          const errorData = await response.json();
+
+          if (errorData.errors) {
+            this.formErrors = errorData.errors;
+          } else {
+            this.formError = "An unexpected error occurred while updating details.";
+          }
+          return;
         }
 
         this.isEditing = false;
@@ -377,6 +394,7 @@ export default defineComponent({
         this.formError = error instanceof Error ? error.message : String(error);
       }
     },
+
     logout() {
       fetch('/logout/', {
         method: 'GET',

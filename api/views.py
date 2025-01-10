@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.shortcuts import render, redirect
-from .models import Hobby, User, FriendRequest
+from .models import Hobby, User, FriendRequest, Friendship
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +15,8 @@ from django.contrib.auth.forms import AuthenticationForm
 import json
 
 from django.middleware.csrf import get_token
+
+from django.db import IntegrityError
 
 
 def get_csrf_token(request):
@@ -229,7 +231,7 @@ def current_user_view(request):
     return JsonResponse(user_data)
 
 
-def send_friend_request(request):
+def friend_request_view(request):
             
     if request.method == "POST":
         try:
@@ -240,6 +242,8 @@ def send_friend_request(request):
 
             if FriendRequest.objects.filter(from_user = from_user, to_user = to_user).exists():
                 return JsonResponse({"message" : "Already Sent"}, status = 400)
+            elif FriendRequest.objects.filter(from_user = to_user, to_user = from_user).exists():
+                return JsonResponse({"message" : "This person has already sent a friend request to you"}, status = 400)
 
             FriendRequest.objects.create(from_user = from_user, to_user=to_user)
             return JsonResponse({"message" : "Friend Request Sent"})
@@ -269,7 +273,18 @@ def send_friend_request(request):
 
             friend_request.status = "accepted"
             friend_request.save()
-            return JsonResponse({"message" : "Friend Request Accepted"})
+
+            from_user = friend_request.from_user
+
+            try:
+
+                Friendship.objects.create(user=from_user, friend=to_user)
+                Friendship.objects.create(user=to_user, friend=from_user)
+
+            except IntegrityError:
+                return JsonResponse({"message" : "Friendship already exists"})
+
+            return JsonResponse({"message" : "Friend request accepted and frienship established"})
 
 
         except User.DoesNotExist:
@@ -278,5 +293,19 @@ def send_friend_request(request):
 
         
     return JsonResponse({"message" : " Invalid Request"}, status = 405)
+
+
+def friendship_view(request):
+    if request.method == "GET":
+
+        local_user = request.user
+
+        friendship_list = Friendship.objects.filter(user = local_user)
+
+        friendship_list = [x.get_friend() for x in friendship_list]
+
+        return JsonResponse(friendship_list, safe=False)
+
+
 
 

@@ -14,13 +14,14 @@
       <button @click="filterByAge" class="filter_button">Filter</button>
     </div>
     <ul>
-      <li class="user-container"  v-for="user in user_arr"   :key="user.id" >
+      <li class="user-container"  v-for="user in user_arr"   :key="user.id ?? 0" >
           <div class="div-1">
             <div class="div-11">
               <p>Name:</p>
               <p class="name">{{ user.username }}</p>
             </div>
-            <button class="add_button" @click="sendFriendRequest(user.id)">Add Friend</button>
+            <button v-if="!friend_list.includes(user.id ?? 0)" class="add_button" @click="sendFriendRequest(user.id ?? 0)">Add Friend</button>
+            <button v-else class="add_button" style="background-color: #007BFF;">Friend</button>
           </div>
           <div class="div-2">
             <p>Hobbies:</p>
@@ -41,9 +42,14 @@
     
 
     interface User {
-      id: string,
+      id: number | null,
       username: string | null,
       hobbies: string[]
+    }
+
+    interface Friend {
+      friend_id: number,
+      friend_name: string,
     }
 
     export default defineComponent({
@@ -51,6 +57,7 @@
             return {
                 title: "Other Page",
                 user_arr: [] as User[],
+                friend_list: [] as  number[],
                 minAge: 0,
                 maxAge: 100,
                 csrfToken: "",
@@ -65,7 +72,7 @@
         computed: {
             local_user():User{
               return{
-                id: this.userStore.user_id || "",
+                id: this.userStore.user_id || null,
                 username: this.userStore.username,
                 hobbies: this.userStore.hobbies
               };
@@ -92,6 +99,24 @@
             catch (error){
               console.error(`Error fetching token, ${error}`)
             }
+          },
+          async fetch_friends(){
+            fetch("http://127.0.0.1:8000/friendships/", {
+              method: "GET",
+              credentials: "include",
+            })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data: Friend[]) => {
+              this.friend_list = data.map((friend) => friend.friend_id);
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
           },
           async fetch_users(){
 
@@ -152,7 +177,7 @@
           filterByAge(){
             this.fetch_users();
           },
-          async sendFriendRequest(friend_id : string){
+          async sendFriendRequest(friend_id : number){
             const url = "http://127.0.0.1:8000/send_friend_request/";
 
             try{
@@ -185,6 +210,7 @@
         },
         async mounted(){
           await this.fetch_csrf_token();
+          this.fetch_friends();
           this.fetch_users();
         }
     })
@@ -334,6 +360,7 @@ ul{
   border: none;
   border-radius: 0.3rem;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  width: 8rem;
 }  
 
 .add_button:hover{

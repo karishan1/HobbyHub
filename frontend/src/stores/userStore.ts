@@ -2,12 +2,12 @@ import { defineStore } from "pinia";
 
 export const useUserStore = defineStore('userStore', {
     state: () => ({
-        user_id: null as string | null,
+        user_id: null as number | null,
         username: null as string | null,
         hobbies: [] as string[],
     }),
     actions: {
-        setUser(userId: string, username: string, hobbies: string[]){
+        setUser(userId: number, username: string, hobbies: string[]){
             this.user_id = userId;
             this.username = username;
             this.hobbies = hobbies;

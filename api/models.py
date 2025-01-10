@@ -56,6 +56,12 @@ class Friendship(models.Model):
     def __str__(self):
         return f"{self.user} is friends with {self.friend}"
     
+    def get_friend(self):
+        return {
+            "friend_id": self.friend.id,
+            "friend_name": self.friend.__str__()
+        }
+    
 class FriendRequest(models.Model):
     # Allows Friend requests to be sent from one user to another
 
@@ -77,7 +83,7 @@ class FriendRequest(models.Model):
             "from_user_username": self.from_user.username,
             "status": self.status,
             "to_user_username" : self.to_user.username
-            }
+        }
     
 
 

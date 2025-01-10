@@ -4,18 +4,12 @@ from django.shortcuts import render, redirect
 from .models import Hobby, User, FriendRequest, Friendship
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-
 from django.core.paginator import Paginator
-from django.utils import timezone
 from datetime import timedelta
-
+from django.utils.timezone import now
 from django.contrib.auth.forms import AuthenticationForm
-
 import json
-
 from django.middleware.csrf import get_token
-
 from django.db import IntegrityError
 
 
@@ -28,7 +22,7 @@ def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
 
-
+@login_required
 def add_user_hobby(request):
     try:
         data = json.loads(request.body)
@@ -84,6 +78,7 @@ def add_hobby_to_db(request):
         return JsonResponse({"error": "Invalid JSON format"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
 
 def displayhobbies(request):
     if request.method == 'GET':
@@ -171,6 +166,7 @@ def signup_view(request):
     form = CustomUserCreationForm()
     return render(request, "signup.html", {"form": form})
 
+@login_required
 def user_view(request):
     if request.method == 'GET': 
         User = get_user_model()
@@ -178,6 +174,7 @@ def user_view(request):
         user_list = [x.to_dict() for x in all_users]
         return JsonResponse(user_list, safe=False)
     
+@login_required 
 def user_list_view(request):
     if request.method == 'GET':
         User = get_user_model()
@@ -188,17 +185,42 @@ def user_list_view(request):
         min_age = request.GET.get('min_age',None)
         max_age = request.GET.get('max_age',None)
 
+        today = now().date()
+
         if min_age:
-            all_users = all_users.filter(DOB__lte=timezone.now() - timedelta(days=int(min_age)*365))
+            min_age_date = today - timedelta(days=int(min_age)*365)
+            all_users = [x for x in all_users if x.DOB is not None and x.DOB <= min_age_date]
         if max_age:
-            all_users = all_users.filter(DOB__gte=timezone.now() - timedelta(days=int(max_age)*365))
+            max_age_date = today - timedelta(days=int(max_age)*365)
+            all_users = [x for x in all_users if x.DOB is not None and x.DOB >= max_age_date]
+
+        logged_user_hobbies = set(logged_user.Hobbies.all())
+
+        def get_common_hobby_count(user):
+            user_hobbies = set(user.Hobbies.all())
+            return len(logged_user_hobbies & user_hobbies)
+        
+        for i in range(len(all_users)):
+            for j in range(i+1, len(all_users)):
+                if get_common_hobby_count(all_users[j]) > get_common_hobby_count(all_users[i]):
+                    temp = all_users[i]
+                    all_users[i] = all_users[j]
+                    all_users[j] = temp
 
         page_number = request.GET.get('page', 1)
         paginator = Paginator(all_users, 10)
         page_object = paginator.get_page(page_number)
 
         user_list = [x.to_dict_user_list() for x in page_object]
-        return JsonResponse(user_list, safe=False)
+
+        response_data = {
+            'user_list': user_list,
+            'total_pages': paginator.num_pages,
+            'current_page': page_object.number,
+            'has_next': page_object.has_next(),
+            'has_previous': page_object.has_previous(),
+        }
+        return JsonResponse(response_data, safe=False)
     
 
 @login_required
@@ -230,7 +252,7 @@ def current_user_view(request):
     }
     return JsonResponse(user_data)
 
-
+@login_required
 def friend_request_view(request):
             
     if request.method == "POST":
@@ -294,7 +316,7 @@ def friend_request_view(request):
         
     return JsonResponse({"message" : " Invalid Request"}, status = 405)
 
-
+@login_required
 def friendship_view(request):
     if request.method == "GET":
 

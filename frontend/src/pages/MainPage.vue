@@ -71,9 +71,9 @@
       <div class="blob hobbies">
         <h2>Hobbies</h2>
         <ul class="hobby-list">
-          <li v-for="hobby in user.hobbies" :key="hobby" class="hobby-item">
-            {{ hobby }}
-            <button @click="removeHobby(hobby)" class="remove-btn">X</button>
+          <li v-for="hobby in user.hobbies" :key="hobby">
+            <p>{{ hobby }}</p>
+            <button @click="removeHobby(hobby)">X</button>
           </li>
         </ul>
         <button @click="showHobbiesModal = true" class="edit-btn">Edit Hobbies</button>
@@ -82,19 +82,19 @@
     
       <div v-if="showHobbiesModal" class="modal">
         <div class="modal-content">
-          <h4>Add a New Hobby to the Database</h4>
-          <input v-model="newHobbyName" placeholder="Type new hobby name..." />
-          <button @click="addNewHobby" class="add-btn">Add Hobby</button>
-
-          <h4>Available Hobbies</h4>
-          <ul>
-            <li v-for="hobby in availableHobbies" :key="hobby.id" class="hobby-item">
-              {{ hobby.hobby_name }}
+          <h4>Add hobby</h4>
+          <div class="add_new_hobby">
+            <input v-model="newHobbyName" placeholder="Enter your own hobby" />
+            <button @click="addNewHobby" class="add-btn">Add Hobby</button>
+          </div>
+          <h4 style="margin-top: 1.3rem;">Choose from available hobbies</h4>
+          <ul class="choose_hobby">
+            <li  v-for="hobby in availableHobbies.filter(h => !userStore.hobbies.includes(h.hobby_name))" :key="hobby.id" >
+              <p>{{ hobby.hobby_name }}</p>
               <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
             </li>
           </ul>
-
-          <button @click="showHobbiesModal = false" class="cancel-btn">Close</button>
+          <button style="align-self: flex-end; margin-right: 0.8rem;" @click="showHobbiesModal = false" class="cancel-btn">Close</button>
         </div>
       </div>
       <div v-if="showRequestsModal == true" class="modal">
@@ -580,21 +580,55 @@ export default defineComponent({
 
   /* Hobbies List */
   .hobby-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 12rem;
+    overflow-y: auto;
   }
 
-  .hobby-item {
-    background: #ffebcd;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    color: #333;
-    font-weight: bold;
+  .hobby-list li{
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    background-color: white;
+    align-items: center;
+    color: black;
+    height: 2.5rem;
+    border-radius: 0.3rem;
+    padding-left: 1rem;
+    gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+    border: 1.5px black solid;
+    border-right: none;
   }
+
+  .hobby-list li p{
+    margin: 0;
+    padding: 0;
+  }
+
+  .hobby-list button{
+    height: 2.5rem;
+    border: none;
+    width: auto;
+    background-color: #dc3545;
+    border-top-right-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+    color: white;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .hobby-list button:hover{
+    background-color: #ff5162;
+
+  }
+
+
 
   /* Loading */
   .loading {
@@ -622,6 +656,9 @@ export default defineComponent({
 }
 
 .modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -629,16 +666,95 @@ export default defineComponent({
   width: 100%;
 }
 
-.hobby-item {
-  display: flex;
-  align-items: center;
-  background: #ffebcd;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: bold;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+.modal-content h4{
+  align-self: flex-start;
+  margin-left: 1rem;
 }
+
+.choose_hobby{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 27rem;
+  max-height: 15rem;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+.choose_hobby li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  background-color: white;
+  color: black;
+  height: 2.5rem;
+  border-radius: 0.3rem;
+  padding-left: 1rem;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+  border: 1.5px black solid;
+  border-right: none;
+}
+.choose_hobby li p{
+  margin: 0;
+  padding: 0;
+}
+
+.choose_hobby li button{
+  border: none;
+  font-size: 0.85rem;
+  height: 2.5rem;
+  background-color: #0aa32e;
+  border-top-right-radius: 0.3rem;
+  border-bottom-right-radius: 0.3rem;
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+  color: white;
+  border: 1.5px #0aa32e solid;
+
+}
+
+.choose_hobby li button:hover{
+  background-color: #1bce44;
+  border: 1.5px #1bce44 solid;
+}
+
+.add_new_hobby{
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 27rem;
+}
+
+.add_new_hobby input{
+  width: 18rem;
+  height: 2.4rem;
+  border-radius: 0.3rem;
+  border: black 1.5px solid;
+  font-size: 1rem;
+  padding-left: 0.5rem;
+}
+
+.add_new_hobby button{
+  color: white;
+  background-color: #0aa32e;
+  font-size: 0.9rem;
+  border: none;
+  width: 8rem;
+  border-radius: 0.3rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
+}
+
+.add_new_hobby button:hover{
+  background-color: #0aa32ec8;
+  transition: 0.2s ease;
+}
+
+
 
 .remove-btn {
   background: #dc3545;

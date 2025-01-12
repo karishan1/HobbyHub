@@ -17,28 +17,22 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.http import HttpResponse
-from .views import login_view,home_view,logout_view,signup_view,user_view,user_list_view,current_user_view,add_user_hobby,displayhobbies,add_hobby_to_db,remove_user_hobby, friend_request_view, get_csrf_token, friendship_view, change_password_view
-
+from . import views
 
 
 from .views import main_spa
 
 urlpatterns = [
     path("main/", main_spa),
-    path("", login_view, name="login"),
-    path("home/", home_view, name="home"),
-    path("logout/",logout_view, name = "logout"),
-    path("signup/",signup_view, name = "signup"),
-    path("user/",user_view,name="user"),
-    path("user_list/",user_list_view,name="user_list"),
-    path("api/current-user/",current_user_view, name = "current_user"),
-    path('display_hobby/', displayhobbies, name='display_hobbies'),
-    path("add_user_hobby/", add_user_hobby, name="add_user_hobby"),
-    path("add_hobby_to_db/", add_hobby_to_db, name="add_hobby_to_db"),
-    path("remove_user_hobby/", remove_user_hobby, name="remove_user_hobby"),
-    path("send_friend_request/", friend_request_view , name="send_friend_request"),
-    path("friendships/", friendship_view , name="friendships"),
-    path("get_csrf_token/", get_csrf_token, name="get_csrf_token"),
-    path("change-password/",change_password_view, name="password_change"),
+    path("", views.login_view, name="login"),
+    path("home/", views.home_view, name="home"),
+    path("logout/",views.logout_view, name = "logout"),
+    path("signup/",views.signup_view, name = "signup"),
+    path("user_list/",views.user_list_view,name="user_list"),
+    path("current-user/",views.current_user_view, name = "current_user"),
+    path("hobby_db/", views.hobby_db_view, name="add_hobby_to_db"),
+    path("friend_request/", views.friend_request_view , name="send_friend_request"),
+    path("friendships/", views.friendship_view , name="friendships"),
+    path("get_csrf_token/", views.get_csrf_token, name="get_csrf_token"),
     
 ]

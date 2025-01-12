@@ -31,9 +31,12 @@
             </ul>
           </div>
       </li>
-      <div class="paginator-container">
+      <div class="paginator-container" v-if="user_arr.length > 0">
         <button class="page-button" :disabled="!hasPrevious" @click="fetch_users(currentPage -1)">Previous</button>
         <button class="page-button" :disabled="!hasNext" @click="fetch_users(currentPage + 1)">Next</button>
+      </div>
+      <div v-else-if="user_arr.length == 0" class="no-users">
+        <p>No users in the age range</p>
       </div>
     </ul>
   </div>
@@ -161,7 +164,7 @@
             this.fetch_users();
           },
           async sendFriendRequest(friend_id : number){
-            const url = "http://127.0.0.1:8000/send_friend_request/";
+            const url = "http://127.0.0.1:8000/friend_request/";
 
             try{
               const response = await fetch(url,{
@@ -200,6 +203,20 @@
 </script>
 
 <style scoped>
+
+.no-users{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #a1a1a1;
+  color: white;
+  width: 40rem;
+  height: 10rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-size: 2rem;
+  border-radius: 1rem;
+}
 
 .paginator-container{
   display: flex;

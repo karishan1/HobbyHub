@@ -195,8 +195,12 @@ export default defineComponent({
     },
     async fetchUser() { 
        // Fetches current user data
-      fetch("http://127.0.0.1:8000/api/current-user/", {
+      fetch("http://127.0.0.1:8000/current-user/", {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": this.csrfToken,
+        },
         credentials: "include",
       })
       .then((response) => {
@@ -214,8 +218,12 @@ export default defineComponent({
       });
     },
     async fetchRequests(){
-      fetch("http://127.0.0.1:8000/send_friend_request/", {
+      fetch("http://127.0.0.1:8000/friend_request/", {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": this.csrfToken,
+        },
         credentials: "include",
       })
       .then((response) => {
@@ -234,7 +242,7 @@ export default defineComponent({
 
     },
     async acceptRequest(id:number){
-      const url = "http://127.0.0.1:8000/send_friend_request/";
+      const url = "http://127.0.0.1:8000/friend_request/";
 
       try{
         const response = await fetch(url,{
@@ -262,11 +270,15 @@ export default defineComponent({
         alert(`Error`);
       }
     },
-
     async fetchHobbies() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/display_hobby/", {
+        const response = await fetch("http://127.0.0.1:8000/hobby_db/", {
           method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": this.csrfToken,
+          },
+          credentials: "include",
         });
         if (!response.ok) {
           throw new Error(`Failed to fetch hobbies: ${response.status}`);
@@ -280,13 +292,13 @@ export default defineComponent({
     async addExistingHobby(hobbyId: number) {
       try {
  
-        const response = await fetch("http://127.0.0.1:8000/add_user_hobby/", {
-          method: "POST",
+        const response = await fetch("http://127.0.0.1:8000/current-user/", {
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": this.csrfToken,
           },
-          body: JSON.stringify({ hobby_id: hobbyId }),
+          body: JSON.stringify({ hobby_id: hobbyId, action: "add hobby" }),
           credentials: "include",
         });
 
@@ -310,7 +322,7 @@ export default defineComponent({
         return;
       }
       try {
-        const response = await fetch("http://127.0.0.1:8000/add_hobby_to_db/", {
+        const response = await fetch("http://127.0.0.1:8000/hobby_db/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -334,13 +346,13 @@ export default defineComponent({
     async removeHobby(hobbyName: string) {
       try {
 
-        const response = await fetch("http://127.0.0.1:8000/remove_user_hobby/", {
-          method: "POST",
+        const response = await fetch("http://127.0.0.1:8000/current-user/", {
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": this.csrfToken,          
           },
-          body: JSON.stringify({ hobby_name: hobbyName }),
+          body: JSON.stringify({ hobby_name: hobbyName, action: "remove hobby" }),
           credentials: "include",
         });
 
@@ -366,7 +378,7 @@ export default defineComponent({
       this.formError = null; 
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/current-user/", {
+        const response = await fetch("http://127.0.0.1:8000/current-user/", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -426,9 +438,8 @@ export default defineComponent({
     
     async changePassword() {
         this.formErrors = {}; // Reset errors
-
         try {
-          const response = await fetch("http://127.0.0.1:8000/change-password/", {
+          const response = await fetch("http://127.0.0.1:8000/current-user/", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -436,6 +447,7 @@ export default defineComponent({
             },
             credentials: "include",
             body: JSON.stringify({
+              action: "change password",
               old_password: this.passwordForm.oldPassword,
               new_password1: this.passwordForm.newPassword,
               new_password2: this.passwordForm.confirmPassword,

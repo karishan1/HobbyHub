@@ -1,31 +1,40 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django import forms
+from django.db.models import Model
+from typing import Tuple
+
+User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
-    DOB = forms.DateField(
+    DOB: forms.DateField = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
         required=True,
         label="Date of Birth"
     )
 
     class Meta:
-        model = get_user_model()  # Use the custom User model
-        fields = ("username", "email", "DOB", "password1", "password2")  # Include DOB
+        model: type[Model] = User  # Use the custom User model
+        fields: Tuple[str, str, str, str, str] = (
+            "username",
+            "email",
+            "DOB", 
+            "password1", 
+            "password2")  # Include DOB
         
 class CustomUserUpdateForm(forms.ModelForm):
-    DOB = forms.DateField(
+    DOB: forms.DateField = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
         required=True,
         label="Date of Birth"
     )
 
     class Meta:
-        model = get_user_model()  # Use the custom User model
-        fields = ("username", "email", "DOB")  # Fields to update
+        model: type[Model] = User  # Use the custom User model
+        fields: Tuple[str,str,str] = ("username", "email", "DOB")  # Fields to update
 
-    def clean_username(self):
-        username = self.cleaned_data.get("username")
+    def clean_username(self) -> str:
+        username: str = self.cleaned_data.get("username")
         # Check if another user exists with the same username
         if get_user_model().objects.filter(username=username).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("This username is already in use. Please choose a different one.")

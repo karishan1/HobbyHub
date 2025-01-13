@@ -1,30 +1,34 @@
 import { defineStore } from "pinia";
 
+interface UserState {
+    user_id: number | null;
+    username: string | null;
+    hobbies: string[];
+}
+
 export const useUserStore = defineStore('userStore', {
-    state: () => ({
-        user_id: null as number | null,
-        username: null as string | null,
-        hobbies: [] as string[],
+    state: (): UserState => ({
+        user_id: null,
+        username: null,
+        hobbies: [],
     }),
     actions: {
-        setUser(userId: number, username: string, hobbies: string[]){
+        setUser(userId: number, username: string, hobbies: string[]): void {
             this.user_id = userId;
             this.username = username;
             this.hobbies = hobbies;
-
             localStorage.setItem('user', JSON.stringify(this.$state));
         },
-        loadUser() {
+        loadUser(): void {
             const user = localStorage.getItem('user');
             if (user){
                 const parsedUser = JSON.parse(user);
                 this.user_id = parsedUser.userId;
                 this.username = parsedUser.username;
                 this.hobbies = parsedUser.hobbies;
-
             }
         },
-        clearUser(){
+        clearUser(): void {
             this.user_id = null;
             this.username = null;
             this.hobbies = [];

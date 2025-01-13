@@ -13,193 +13,201 @@
       </div>
       <button @click="filterByAge" class="filter_button">Filter</button>
     </div>
-    <ul>
-      <li class="user-container"  v-for="user in user_arr"   :key="user.id ?? 0" >
-          <div class="div-1">
-            <div class="div-11">
-              <p>Name:</p>
-              <p class="name">{{ user.username }}</p>
+    <div v-if="loading">
+      <p>Loading ...</p>
+    </div>
+    <div v-else>
+      <ul>
+        <li class="user-container"  v-for="user in user_arr"   :key="user.id ?? 0" >
+            <div class="div-1">
+              <div class="div-11">
+                <p>Name:</p>
+                <p class="name">{{ user.username }}</p>
+              </div>
+              <button v-if="!friend_list.includes(user.id ?? 0)" class="add_button" @click="sendFriendRequest(user.id ?? 0)">Add Friend</button>
+              <button v-else class="add_button" disabled style="background-color: #007BFF;">Friend</button>
             </div>
-            <button v-if="!friend_list.includes(user.id ?? 0)" class="add_button" @click="sendFriendRequest(user.id ?? 0)">Add Friend</button>
-            <button v-else class="add_button" disabled style="background-color: #007BFF;">Friend</button>
-          </div>
-          <div class="div-2">
-            <p>Hobbies:</p>
-            <ul class="hobby-container">
-              <li class="hobby-box" v-if="user.hobbies.length > 0"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
-              <li v-else class="hobby-box" style="background-color: #d80606;">No hobbies </li>
-            </ul>
-          </div>
-      </li>
-      <div class="paginator-container" v-if="user_arr.length > 0">
-        <button class="page-button" :disabled="!hasPrevious" @click="fetch_users(currentPage -1)">Previous</button>
-        <button class="page-button" :disabled="!hasNext" @click="fetch_users(currentPage + 1)">Next</button>
-      </div>
-      <div v-else-if="user_arr.length == 0" class="no-users">
-        <p>No users in the age range</p>
-      </div>
-    </ul>
+            <div class="div-2">
+              <p>Hobbies:</p>
+              <ul class="hobby-container">
+                <li class="hobby-box" v-if="user.hobbies.length > 0"  v-for="hobby in user.hobbies" :key="hobby" >{{ hobby}}</li>
+                <li v-else class="hobby-box" style="background-color: #d80606;">No hobbies </li>
+              </ul>
+            </div>
+        </li>
+        <div class="paginator-container" v-if="user_arr.length > 0">
+          <button class="page-button" :disabled="!hasPrevious" @click="fetch_users(currentPage -1)">Previous</button>
+          <button class="page-button" :disabled="!hasNext" @click="fetch_users(currentPage + 1)">Next</button>
+        </div>
+        <div v-else-if="user_arr.length == 0" class="no-users">
+          <p>No users in the age range</p>
+        </div>
+      </ul>
+    </div>
+
   </div>
 
 </template>
 
 <script lang="ts">
-    import { defineComponent } from "vue";
-    import { useUserStore } from '../stores/userStore';
-    
-
-    interface User {
-      id: number | null,
-      username: string | null,
-      hobbies: string[]
-    }
-
-    interface Friend {
-      friend_id: number,
-      friend_name: string,
-    }
-
-    export default defineComponent({
-        data() {
-            return {
-                title: "Other Page",
-                user_arr: [] as User[],
-                friend_list: [] as  number[],
-                minAge: 0,
-                maxAge: 100,
-                csrfToken: "",
-                currentPage: 1,
-                totalPages: 1,
-                hasNext: false,
-                hasPrevious: false,
-
-            }
-        },
-        setup(){
-          const userStore = useUserStore();
-          userStore.loadUser();
-
-          return {userStore};
-        },
-        computed: {
-            local_user():User{
-              return{
-                id: this.userStore.user_id || null,
-                username: this.userStore.username,
-                hobbies: this.userStore.hobbies
-              };
-            },
-        },
-        methods:{
-          async fetch_csrf_token(){
-            const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
-            try{
-              const response = await fetch(url,{
-                method: "GET",
-                credentials: "include", 
-              });
-
-              if (response.ok){
-                const data = await response.json();
-                this.csrfToken = data.csrfToken;
-                console.log(`Fetched csrf token: ${this.csrfToken}`);
-              }
-              else{
-                console.log(`Failed to fetch token, ${response.statusText}`)
-              }
-            }
-            catch (error){
-              console.error(`Error fetching token, ${error}`)
-            }
-          },
-          async fetch_friends(){
-            fetch("http://127.0.0.1:8000/friendships/", {
-              method: "GET",
-              credentials: "include",
-            })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
-              return response.json();
-            })
-            .then((data: Friend[]) => {
-              this.friend_list = data.map((friend) => friend.friend_id);
-            })
-            .catch((error) => {
-              alert(error.message);
-            });
-          },
-          async fetch_users(page = 1){
-
-            const url = new URL("http://127.0.0.1:8000/user_list/");
-
-            url.searchParams.append("page", page.toString());
-            if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
-            if (this.maxAge) url.searchParams.append("max_age", this.maxAge.toString());
-
-            fetch(url.toString(), {
-                method: "GET",
-                credentials: "include", 
-              })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-              })
-              .then((data) => {
-                this.user_arr = data.user_list; 
-                this.currentPage = data.current_page;
-                this.totalPages = data.total_pages;
-                this.hasNext = data.has_next;
-                this.hasPrevious = data.has_previous;
-              })
-              .catch((error) => {
-                error = error.message; 
-              });
-          },
-
-          filterByAge(){
-            this.fetch_users();
-          },
-          async sendFriendRequest(friend_id : number){
-            const url = "http://127.0.0.1:8000/friend_request/";
-
-            try{
-              const response = await fetch(url,{
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "X-CSRFToken": this.csrfToken,
-                },
-                credentials: "include",
-                body: JSON.stringify({to_friend_id: friend_id}),
-              });
-
-              if (response.ok){
-                alert(`Friend request sent to ${friend_id}`);
-              }
-              else{
-                const error = await response.json();
-                alert(`${error.message}`);
-
-              }
-            }
-            catch(error) {
-              alert(`Error`);
-            }
-          }
 
 
+import { defineComponent } from "vue";
+import { useUserStore } from '../stores/userStore';
 
-        },
-        async mounted(){
-          await this.fetch_csrf_token();
-          this.fetch_friends();
-          this.fetch_users();
+
+interface User {
+  readonly id: number | null,
+  readonly username: string | null,
+  readonly hobbies: string[]
+}
+
+interface Friend {
+  readonly friend_id: number,
+  readonly friend_name: string,
+}
+
+export default defineComponent({
+    data() {
+        return {
+            title: "Other Page" as string,
+            user_arr: [] as User[],
+            friend_list: [] as  number[],
+            minAge: 0 as number,
+            maxAge: 100 as number,
+            csrfToken: "" as string,
+            currentPage: 1 as number,
+            totalPages: 1 as number,
+            hasNext: false as boolean,
+            hasPrevious: false as boolean,
+            loading: true as boolean,
         }
-    })
+    },
+    setup(){
+      const userStore = useUserStore();
+      userStore.loadUser();
+      return {userStore};
+    },
+    computed: {
+      local_user(): User{
+        return{
+          id: this.userStore.user_id || null,
+          username: this.userStore.username || null,
+          hobbies: this.userStore.hobbies || null,
+        };
+      },
+    },
+    methods:{
+      async fetch_csrf_token(): Promise<void> {
+        const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
+        try{
+          const response = await fetch(url,{
+            method: "GET",
+            credentials: "include", 
+          });
+
+          if (response.ok){
+            const data = await response.json();
+            this.csrfToken = data.csrfToken;
+            console.log(`Fetched csrf token: ${this.csrfToken}`);
+          }
+          else{
+            console.log(`Failed to fetch token, ${response.statusText}`)
+          }
+        }
+        catch (error){
+          console.error(`Error fetching token, ${error}`)
+        }
+      },
+      async fetch_friends(): Promise<void> {
+        fetch("http://127.0.0.1:8000/friendships/", {
+          method: "GET",
+          credentials: "include",
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data: Friend[]) => {
+          this.friend_list = data.map((friend) => friend.friend_id);
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+      },
+      async fetch_users(page = 1): Promise<void> {
+
+        this.loading = true;
+
+        const url = new URL("http://127.0.0.1:8000/user_list/");
+
+        url.searchParams.append("page", page.toString());
+        if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
+        if (this.maxAge) url.searchParams.append("max_age", this.maxAge.toString());
+
+        fetch(url.toString(), {
+            method: "GET",
+            credentials: "include", 
+          })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            this.user_arr = data.user_list; 
+            this.currentPage = data.current_page;
+            this.totalPages = data.total_pages;
+            this.hasNext = data.has_next;
+            this.hasPrevious = data.has_previous;
+
+            this.loading = false;
+          })
+          .catch((error) => {
+            error = error.message; 
+          });
+      },
+
+      filterByAge(): void {
+        this.fetch_users();
+      },
+      async sendFriendRequest(friend_id : number): Promise<void> {
+        const url = "http://127.0.0.1:8000/friend_request/";
+
+        try{
+          const response = await fetch(url,{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": this.csrfToken,
+            },
+            credentials: "include",
+            body: JSON.stringify({to_friend_id: friend_id}),
+          });
+
+          if (response.ok){
+            alert(`Friend request sent to ${friend_id}`);
+          }
+          else{
+            const error = await response.json();
+            alert(`${error.message}`);
+
+          }
+        }
+        catch(error) {
+          alert(`Error`);
+        }
+      }
+    },
+    async mounted(){
+      await this.fetch_csrf_token();
+      this.fetch_friends();
+      this.fetch_users();
+    }
+})
 </script>
 
 <style scoped>

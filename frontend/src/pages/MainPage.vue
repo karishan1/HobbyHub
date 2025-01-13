@@ -1,9 +1,5 @@
 <template>
   <div class="mainpage-container">
-    <div class="logout-container">
-      <!-- Logout Button-->
-      <button @click="logout" class="logout-btn">Logout</button>
-    </div>
     <h1 class="title">{{ title }}</h1>
 
     <div v-if="error" class="error">
@@ -13,7 +9,10 @@
     <div v-else-if="user.username" class="content-container">
       <!-- User Information Blob -->
       <div class="blob user-info">
-        <h2>User Information</h2>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom: 1rem;">
+          <h2>User Information</h2>
+          <button @click="logout" class="logout-btn">Logout</button>
+        </div>
         <!-- Editable Form -->
         <div v-if="isEditing">
           <!-- Toggle Between Details and Password Form -->
@@ -139,6 +138,12 @@ interface FriendRequest {
   from_user_username : string,
   status : string
 }
+interface PasswordForm{
+
+  oldPassword: string
+  newPassword: string,
+  confirmPassword: string,
+}
 
 export default defineComponent({
   name: "MainPage",
@@ -150,29 +155,25 @@ export default defineComponent({
       editedUser: {} as User,
       availableHobbies: [] as Hobby[],
       friendRequests: [] as FriendRequest[],
-      newHobbyName: "",
-      passwordForm: {
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      },
-      isEditing: false,
-      isChangingPassword: false,
+      newHobbyName: "" as string,
+      passwordForm: {} as PasswordForm,
+      isEditing: false as boolean,
+      isChangingPassword: false as boolean,
       error: null as string | null,
       formError: null as string | null,
-      showHobbiesModal: false,
-      showRequestsModal: false,
+      showHobbiesModal: false as boolean,
+      showRequestsModal: false as boolean,
       formErrors: {} as { [key: string]: string[] },
-      csrfToken: "",
+      csrfToken: "" as string,
     };
   },
   computed: {
-        userStore(){
+        userStore(): ReturnType<typeof useUserStore>{
             return useUserStore();
         }
     },
   methods: {
-    async fetch_csrf_token(){
+    async fetch_csrf_token(): Promise<void>{
       const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
       try{
         const response = await fetch(url,{
@@ -193,7 +194,7 @@ export default defineComponent({
         console.error(`Error fetching token, ${error}`)
       }
     },
-    async fetchUser() { 
+    async fetchUser(): Promise<void> { 
        // Fetches current user data
       fetch("http://127.0.0.1:8000/current-user/", {
         method: "GET",
@@ -210,14 +211,14 @@ export default defineComponent({
         return response.json();
       })
       .then((data) => {
-        this.user = data;
+        this.user = data as User;
         this.userStore.setUser(data.id, data.username, data.hobbies);
       })
       .catch((error) => {
-        this.error = error.message;
+        this.error = error instanceof Error ? error.message : "Unexpected error";
       });
     },
-    async fetchRequests(){
+    async fetchRequests(): Promise<void>{
       fetch("http://127.0.0.1:8000/friend_request/", {
         method: "GET",
         headers: {
@@ -233,15 +234,15 @@ export default defineComponent({
         return response.json();
       })
       .then((data) => {
-        this.friendRequests = data;
+        this.friendRequests = data as FriendRequest[];
 
       })
       .catch((error) => {
-        this.error = error.message;
+        this.error = error instanceof Error ? error.message : "Unexpected error";
       });
 
     },
-    async acceptRequest(id:number){
+    async acceptRequest(id:number): Promise<void>{
       const url = "http://127.0.0.1:8000/friend_request/";
 
       try{
@@ -270,7 +271,7 @@ export default defineComponent({
         alert(`Error`);
       }
     },
-    async fetchHobbies() {
+    async fetchHobbies(): Promise<void> {
       try {
         const response = await fetch("http://127.0.0.1:8000/hobby_db/", {
           method: "GET",
@@ -289,7 +290,7 @@ export default defineComponent({
       }
     },
 
-    async addExistingHobby(hobbyId: number) {
+    async addExistingHobby(hobbyId: number): Promise<void> {
       try {
  
         const response = await fetch("http://127.0.0.1:8000/current-user/", {
@@ -305,18 +306,14 @@ export default defineComponent({
         if (!response.ok) {
           throw new Error(`Failed to add existing hobby: ${response.status}`);
         }
+        this.fetchUser();
 
-        const hobby = this.availableHobbies.find((h) => h.id === hobbyId);
-        if (hobby && !this.user.hobbies.includes(hobby.hobby_name)) {
-          this.user.hobbies.push(hobby.hobby_name);
-          this.fetchUser();
-        }
       } catch (error) {
         console.error("Error adding existing hobby:", error);
       }
     },
 
-    async addNewHobby() {
+    async addNewHobby(): Promise<void> {
       if (!this.newHobbyName.trim()) {
         alert("Hobby name cannot be empty.");
         return;
@@ -343,7 +340,7 @@ export default defineComponent({
       }
     },
 
-    async removeHobby(hobbyName: string) {
+    async removeHobby(hobbyName: string): Promise<void> {
       try {
 
         const response = await fetch("http://127.0.0.1:8000/current-user/", {
@@ -359,8 +356,6 @@ export default defineComponent({
         if (!response.ok) {
           throw new Error(`Failed to remove hobby: ${response.status}`);
         }
-
-        this.user.hobbies = this.user.hobbies.filter((hobby) => hobby !== hobbyName);
         this.fetchUser();
 
       } catch (error) {
@@ -368,12 +363,12 @@ export default defineComponent({
       }
     },
 
-    editDetails() {
+    editDetails(): void {
       this.editedUser = { ...this.user };
       this.isEditing = true;
     },
 
-    async saveDetails() {
+    async saveDetails(): Promise<void> {
       this.formErrors = {}; 
       this.formError = null; 
 
@@ -407,7 +402,7 @@ export default defineComponent({
       }
     },
 
-    logout() {
+    async logout(): Promise<void> {
       fetch('/logout/', {
         method: 'GET',
         credentials: 'include',
@@ -418,16 +413,16 @@ export default defineComponent({
       });
     },
 
-    cancelEdit() {
+    cancelEdit(): void {
       this.isEditing = false;
       this.isChangingPassword = false;
     },
 
-    togglePasswordChange() {
+    togglePasswordChange(): void {
       this.isChangingPassword = !this.isChangingPassword;
     },
 
-    cancelPasswordChange() {
+    cancelPasswordChange(): void {
       this.isChangingPassword = false;
       this.passwordForm = {
         oldPassword: "",
@@ -436,7 +431,7 @@ export default defineComponent({
       };
     },
     
-    async changePassword() {
+    async changePassword(): Promise<void> {
         this.formErrors = {}; // Reset errors
         try {
           const response = await fetch("http://127.0.0.1:8000/current-user/", {
@@ -471,8 +466,6 @@ export default defineComponent({
           alert("An error occurred. Please try again.");
         }
       }
-
-
 
     },
 
@@ -904,24 +897,27 @@ export default defineComponent({
   border-radius: 5px;
   cursor: pointer;
   margin-top: 1rem;
-  margin-left: 9rem;
+  margin-left: 9.6rem;
+}
+.show-requests:hover{
+  background-color: #007bffc5;
+  transition: 0.2s ease;
+
 }
 .logout-btn {
   background-color: #dc3545; 
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
   border-radius: 5px;
+  height: 2.5rem;
   cursor: pointer;
 }
 .logout-btn:hover {
   opacity: 0.8;
 }
-.logout-container {
-  position: absolute; 
-  top: 10px; 
-  right: -80px; 
-}
+
 
 .form-error {
   color: red;

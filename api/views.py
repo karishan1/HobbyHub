@@ -11,7 +11,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 import json
 from django.middleware.csrf import get_token
 from django.db import IntegrityError
-
+from django.urls import reverse
 from typing import List, Dict, Set, Optional, Tuple, Type, Any
 from django.db.models.query import QuerySet
 from datetime import date
@@ -23,7 +23,7 @@ def get_csrf_token(request: HttpRequest) -> JsonResponse:
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
-    return render(request, 'api/spa/index.html', {})
+    return render(request, 'api/spa/index.html')
 
 @login_required
 def hobby_db_view(request: HttpRequest) -> JsonResponse:
@@ -74,7 +74,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
         if form.is_valid():
             user: User = form.get_user()
             login(request, user)
-            return redirect("http://localhost:5173/")  # Redirect to Vue frontend
+            return redirect(reverse("home")) # Redirect to Vue frontend
         else:
             return render(request, "login.html", {"form": form, "error": "Invalid username or password."})
 
@@ -83,7 +83,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
 def home_view(request: HttpRequest) -> HttpResponse:
     #hobbies = request.user.hobbies.all()
-    return render(request, "home.html", {"user": request.user})
+    return render(request, "api/spa/index.html", {"user": request.user})
 
 
 def logout_view(request: HttpRequest) -> HttpResponse:
@@ -100,7 +100,7 @@ def signup_view(request: HttpRequest) -> HttpResponse:
         if form.is_valid():
             user: User = form.save()  # Save the new user
             login(request, user)  # Log in the user
-            return redirect("http://localhost:5173/")
+            return redirect(reverse("home"))
         else:
             return render(request, "signup.html", {"form": form})  
 

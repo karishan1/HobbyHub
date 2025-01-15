@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.http import HttpResponse
 from . import views
 
@@ -23,7 +23,7 @@ from . import views
 from .views import main_spa
 
 urlpatterns = [
-    path("main/", main_spa),
+    re_path("home", main_spa),
     path("", views.login_view, name="login"),
     path("home/", views.home_view, name="home"),
     path("logout/",views.logout_view, name = "logout"),

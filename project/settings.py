@@ -35,6 +35,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Ensure this points to the correct path
+]
+
+
 
 # Application definition
 
@@ -94,7 +100,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR, 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

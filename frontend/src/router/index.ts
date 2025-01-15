@@ -15,8 +15,9 @@ let base = (import.meta.env.MODE == 'development') ? import.meta.env.BASE_URL : 
 const router = createRouter({
     history: createWebHistory(base),
     routes: [
-        { path: '/', name: 'Main Page', component: MainPage },
+        { path: '/home', name: 'Main Page', component: MainPage },
         { path: '/other/', name: 'Other Page', component: OtherPage },
+
     ]
 })
 

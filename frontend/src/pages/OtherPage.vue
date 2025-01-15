@@ -99,7 +99,7 @@ export default defineComponent({
     },
     methods:{
       async fetch_csrf_token(): Promise<void> {
-        const url = new URL("http://127.0.0.1:8000/get_csrf_token/");
+        const url = new URL("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/get_csrf_token/");
         try{
           const response = await fetch(url,{
             method: "GET",
@@ -120,7 +120,7 @@ export default defineComponent({
         }
       },
       async fetch_friends(): Promise<void> {
-        fetch("http://127.0.0.1:8000/friendships/", {
+        fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/friendships/", {
           method: "GET",
           credentials: "include",
         })
@@ -141,7 +141,7 @@ export default defineComponent({
 
         this.loading = true;
 
-        const url = new URL("http://127.0.0.1:8000/user_list/");
+        const url = new URL("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/user_list/");
 
         url.searchParams.append("page", page.toString());
         if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
@@ -175,7 +175,7 @@ export default defineComponent({
         this.fetch_users();
       },
       async sendFriendRequest(friend_id : number): Promise<void> {
-        const url = "http://127.0.0.1:8000/friend_request/";
+        const url = "https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/friend_request/";
 
         try{
           const response = await fetch(url,{

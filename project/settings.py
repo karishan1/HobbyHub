@@ -73,7 +73,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk",
+    "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -90,7 +90,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk",
+    "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk",
 ]
 
 

@@ -174,7 +174,7 @@ export default defineComponent({
     },
   methods: {
     async fetch_csrf_token(): Promise<void>{
-      const url = new URL("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/get_csrf_token/");
+      const url = new URL("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/get_csrf_token/");
       try{
         const response = await fetch(url,{
           method: "GET",
@@ -196,7 +196,7 @@ export default defineComponent({
     },
     async fetchUser(): Promise<void> { 
        // Fetches current user data
-      fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/current-user/", {
+      fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/current-user/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -219,7 +219,7 @@ export default defineComponent({
       });
     },
     async fetchRequests(): Promise<void>{
-      fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/friend_request/", {
+      fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/friend_request/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -243,7 +243,7 @@ export default defineComponent({
 
     },
     async acceptRequest(id:number): Promise<void>{
-      const url = "https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/friend_request/";
+      const url = "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/friend_request/";
 
       try{
         const response = await fetch(url,{
@@ -273,7 +273,7 @@ export default defineComponent({
     },
     async fetchHobbies(): Promise<void> {
       try {
-        const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/hobby_db/", {
+        const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/hobby_db/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -293,7 +293,7 @@ export default defineComponent({
     async addExistingHobby(hobbyId: number): Promise<void> {
       try {
  
-        const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/current-user/", {
+        const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/current-user/", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -319,7 +319,7 @@ export default defineComponent({
         return;
       }
       try {
-        const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/hobby_db/", {
+        const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/hobby_db/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export default defineComponent({
     async removeHobby(hobbyName: string): Promise<void> {
       try {
 
-        const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/current-user/", {
+        const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/current-user/", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -373,7 +373,7 @@ export default defineComponent({
       this.formError = null; 
 
       try {
-        const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/current-user/", {
+        const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/current-user/", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -407,7 +407,7 @@ export default defineComponent({
         method: 'GET',
         credentials: 'include',
       }).then(() => {
-        window.location.href = 'https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/'; // Redirect to the login page
+        window.location.href = 'https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/'; // Redirect to the login page
       }).catch(error => {
         console.error('Error logging out:', error);
       });
@@ -434,7 +434,7 @@ export default defineComponent({
     async changePassword(): Promise<void> {
         this.formErrors = {}; // Reset errors
         try {
-          const response = await fetch("https://group4-web-apps-ec22977.apps.a.comp-teach.qmul.ac.uk/current-user/", {
+          const response = await fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/current-user/", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

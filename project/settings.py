@@ -74,7 +74,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk",
-]
+] + [f"http://localhost:{port}" for port in range(50000, 52000)]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -90,6 +90,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "http://localhost:51775",
     "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk",
 ]
 

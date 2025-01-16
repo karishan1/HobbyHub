@@ -98,8 +98,17 @@ export default defineComponent({
       },
     },
     methods:{
+      getBaseURL(): string {
+        const hostname = window.location.hostname;
+        
+        if (hostname === "localhost" || hostname === "127.0.0.1") {
+          return "http://127.0.0.1:8000/"; 
+        }
+
+        return "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/";
+      },
       async fetch_csrf_token(): Promise<void> {
-        const url = new URL("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/get_csrf_token/");
+        const url = new URL(`${this.getBaseURL()}get_csrf_token/`);
         try{
           const response = await fetch(url,{
             method: "GET",
@@ -120,7 +129,7 @@ export default defineComponent({
         }
       },
       async fetch_friends(): Promise<void> {
-        fetch("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/friendships/", {
+        fetch(`${this.getBaseURL()}friendships/`, {
           method: "GET",
           credentials: "include",
         })
@@ -141,7 +150,7 @@ export default defineComponent({
 
         this.loading = true;
 
-        const url = new URL("https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/user_list/");
+        const url = new URL(`${this.getBaseURL()}user_list/`);
 
         url.searchParams.append("page", page.toString());
         if (this.minAge) url.searchParams.append("min_age", this.minAge.toString());
@@ -175,7 +184,7 @@ export default defineComponent({
         this.fetch_users();
       },
       async sendFriendRequest(friend_id : number): Promise<void> {
-        const url = "https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/friend_request/";
+        const url = `${this.getBaseURL()}friend_request/`;
 
         try{
           const response = await fetch(url,{

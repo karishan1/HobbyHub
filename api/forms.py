@@ -14,13 +14,13 @@ class CustomUserCreationForm(UserCreationForm):
     )
 
     class Meta:
-        model: type[Model] = User  # Use the custom User model
+        model: type[Model] = User  
         fields: Tuple[str, str, str, str, str] = (
             "username",
             "email",
             "DOB", 
             "password1", 
-            "password2")  # Include DOB
+            "password2")  
         
 class CustomUserUpdateForm(forms.ModelForm):
     DOB: forms.DateField = forms.DateField(
@@ -30,12 +30,11 @@ class CustomUserUpdateForm(forms.ModelForm):
     )
 
     class Meta:
-        model: type[Model] = User  # Use the custom User model
-        fields: Tuple[str,str,str] = ("username", "email", "DOB")  # Fields to update
+        model: type[Model] = User  
+        fields: Tuple[str,str,str] = ("username", "email", "DOB") 
 
     def clean_username(self) -> str:
         username: str = self.cleaned_data.get("username")
-        # Check if another user exists with the same username
         if get_user_model().objects.filter(username=username).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("This username is already in use. Please choose a different one.")
         return username

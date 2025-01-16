@@ -33,14 +33,12 @@ body {
     background-color: #f4f4f9;
 }
 
-/* Website Container */
 .website-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* Header */
 .header {
     background-color: #007bff;
     color: white;

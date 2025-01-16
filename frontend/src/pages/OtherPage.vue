@@ -4,11 +4,11 @@
       <div class="filter-input-container">
         <div class="filter-input">
           <label>Min age:</label>
-          <input type="number" id="min_age" v-model.number="minAge" min="0"/>
+          <input type="number" class="min_age_input" id="min_age" v-model.number="minAge" min="0"/>
         </div>
         <div class="filter-input">
           <label>Max age:</label>
-          <input type="number" id="max_age" v-model.number="maxAge" min="0"/>
+          <input type="number" class="max_age_input" id="max_age" v-model.number="maxAge" min="0"/>
         </div>
       </div>
       <button @click="filterByAge" class="filter_button">Filter</button>

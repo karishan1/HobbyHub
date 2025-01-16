@@ -45,7 +45,6 @@ def hobby_db_view(request: HttpRequest) -> JsonResponse:
             if not hobby_name:
                 return JsonResponse({"error": "Hobby name is required"}, status=400)
 
-            # Check if the hobby already exists, create it if not
             result: Tuple[Hobby,bool] = Hobby.objects.get_or_create(hobby_name=hobby_name)
             hobby, created = result
 
@@ -169,13 +168,11 @@ def current_user_view(request: HttpRequest) -> JsonResponse:
 
             if not action:
                 try:
-                    # Use the form to validate and update user data
                     form: CustomUserUpdateForm = CustomUserUpdateForm(data, instance=request.user)
                     if form.is_valid():
                         form.save()
                         return JsonResponse({"message": "User details updated successfully!"})
                     else:
-                        # Return validation errors
                         print(form.errors)
                         return JsonResponse({"errors": form.errors}, status=400)
                     

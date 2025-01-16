@@ -54,17 +54,16 @@ class MainPage:
 # Test Cases
 class UserAccountTests(StaticLiveServerTestCase):
 
-    host = '127.0.0.1'  # Use 127.0.0.1 instead of localhost
-    port = 8000  # Set the desired fixed port
+    host = '127.0.0.1' 
+    port = 8000
     def setUp(self):
-        # Use environment variable or default path for ChromeDriver
-        chromedriver_path = os.getenv("CHROMEDRIVER_PATH", r"C:\Users\nisha\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe")
+
+        chromedriver_path = os.getenv("CHROMEDRIVER_PATH", r"C:\Users\nisha\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe") # Change as needed
         service = ChromeService(chromedriver_path)
         self.browser = WebDriver(service=service)
         self.wait = WebDriverWait(self.browser, 20)
 
-        # Use environment variable to dynamically set base URL for redirection checks
-        self.base_url = os.getenv("BASE_URL")  # Change default as needed
+        self.base_url = os.getenv("BASE_URL")  
 
     def tearDown(self):
         self.browser.quit()
@@ -81,7 +80,7 @@ class UserAccountTests(StaticLiveServerTestCase):
         logout_button = WebDriverWait(self.browser, 10).until(
             lambda browser: browser.find_element(By.CLASS_NAME, "logout-btn")
         )
-        self.assertIsNotNone(logout_button)  # Ensure the logout button exists
+        self.assertIsNotNone(logout_button) 
         
 
     def test_login(self):
@@ -96,7 +95,7 @@ class UserAccountTests(StaticLiveServerTestCase):
         logout_button = WebDriverWait(self.browser, 10).until(
             lambda browser: browser.find_element(By.CLASS_NAME, "logout-btn")
         )
-        self.assertIsNotNone(logout_button)  # Ensure the logout button exists
+        self.assertIsNotNone(logout_button) 
         
 
     
@@ -231,7 +230,7 @@ class UserAccountTests(StaticLiveServerTestCase):
 
         WebDriverWait(self.browser, 10).until(EC.alert_is_present())
         alert = self.browser.switch_to.alert
-        print(f"Alert text: {alert.text}")  # Debugging
+        print(f"Alert text: {alert.text}") 
         alert.accept()
 
         close_modal_button = WebDriverWait(self.browser, 10).until(

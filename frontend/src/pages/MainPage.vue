@@ -416,7 +416,7 @@ export default defineComponent({
         method: 'GET',
         credentials: 'include',
       }).then(() => {
-        window.location.href = `${this.getBaseURL()}`; // Redirect to the login page
+        window.location.href = `${this.getBaseURL()}`; 
       }).catch(error => {
         console.error('Error logging out:', error);
       });
@@ -441,7 +441,7 @@ export default defineComponent({
     },
     
     async changePassword(): Promise<void> {
-        this.formErrors = {}; // Reset errors
+        this.formErrors = {}; 
         try {
           const response = await fetch(`${this.getBaseURL()}current-user/`, {
             method: "PUT",
@@ -791,11 +791,11 @@ export default defineComponent({
 }
 
 .scrollable-list {
-  max-height: 200px; /* Set a maximum height for the list */
-  overflow-y: auto;  /* Enable vertical scrolling */
-  border: 1px solid #ccc; /* Optional: Add a border for better visibility */
-  padding: 0.5rem; /* Optional: Add some padding */
-  border-radius: 5px; /* Optional: Add rounded corners */
+  max-height: 200px; 
+  overflow-y: auto; 
+  border: 1px solid #ccc; 
+  padding: 0.5rem;
+  border-radius: 5px; 
 }
 .friend-request-container{
   justify-self: flex-end;

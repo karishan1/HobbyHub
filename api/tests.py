@@ -65,7 +65,7 @@ class UserAccountTests(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
-
+    
     def test_signup(self):
         self.browser.get(f"{self.live_server_url}/signup/")
         self.browser.find_element(By.ID, "username").send_keys("testuser")
@@ -94,4 +94,6 @@ class UserAccountTests(StaticLiveServerTestCase):
             lambda browser: browser.find_element(By.CLASS_NAME, "logout-btn")
         )
         self.assertIsNotNone(logout_button)  # Ensure the logout button exists
+        
+
 

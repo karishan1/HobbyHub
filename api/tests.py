@@ -310,3 +310,74 @@ class UserAccountTests(StaticLiveServerTestCase):
         displayed_username = user_list[0].find_element(By.CLASS_NAME, "name").text
         self.assertEqual(displayed_username, "user_age_20")  
 
+
+    def test_add_and_delete_hobbies(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        User.objects.create_user(username="testuser3", password="Password12345!",email = "testuser3@example.com", DOB = "2004-03-05")
+
+        login_page = LoginPage(self.browser)
+        login_page.load(f"{self.live_server_url}/")
+        login_page.login("testuser3", "Password12345!")
+        edit_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, ".blob.hobbies .edit-btn"))
+        )
+        edit_button.click()
+
+
+        hobby_input = WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='Enter your own hobby']"))
+        )
+        hobby_input.clear()
+        hobby_input.send_keys("padel")
+
+        add_hobby_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "add-btn"))
+        )
+        add_hobby_button.click()
+        hobby_input.clear()
+        hobby_input.send_keys("tennis")
+        add_hobby_button.click()
+
+        padel_add_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//ul[@class='choose_hobby']//li[p='padel']//button[@class='add-btn']"))
+        )
+        padel_add_button.click()
+
+        tennis_add_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//ul[@class='choose_hobby']//li[p='tennis']//button[@class='add-btn']"))
+        )
+        tennis_add_button.click()
+
+        close_modal_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "cancel-btn"))
+        )
+        close_modal_button.click()
+        hobby_list = WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "hobby-list"))
+        )
+
+        hobby_items = hobby_list.find_elements(By.TAG_NAME, "li")
+        hobby_texts = [item.text.split('\n')[0] for item in hobby_items]
+
+        self.assertIn("padel", hobby_texts)
+        self.assertIn("tennis", hobby_texts)
+
+                
+        delete_tennis_button = WebDriverWait(self.browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//li[p[text()='tennis']]//button[contains(text(), 'X')]"))
+        )
+        delete_tennis_button.click()
+
+        WebDriverWait(self.browser, 10).until_not(
+            EC.presence_of_element_located((By.XPATH, "//li[p[text()='tennis']]"))
+        )
+
+        hobby_list = WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "hobby-list"))
+        )
+
+        hobby_items = hobby_list.find_elements(By.TAG_NAME, "li")
+        hobby_texts = [item.text.split('\n')[0] for item in hobby_items]
+
+        self.assertNotIn("tennis",hobby_texts)

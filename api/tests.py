@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+
 import os
 import time
 
@@ -72,10 +74,12 @@ class UserAccountTests(StaticLiveServerTestCase):
         self.browser.find_element(By.ID, "password1").send_keys("Password123!")
         self.browser.find_element(By.ID, "password2").send_keys("Password123!")
         self.browser.find_element(By.CLASS_NAME, "btn").click()
-        time.sleep(100)
 
-        # Check redirection based on the environment
-        self.assertIn(self.base_url, self.browser.current_url)
+        logout_button = WebDriverWait(self.browser, 10).until(
+            lambda browser: browser.find_element(By.CLASS_NAME, "logout-btn")
+        )
+        self.assertIsNotNone(logout_button)  # Ensure the logout button exists
+        
 
     def test_login(self):
         from django.contrib.auth import get_user_model
@@ -86,5 +90,8 @@ class UserAccountTests(StaticLiveServerTestCase):
         login_page.load(f"{self.live_server_url}/")
         login_page.login("testuser", "Password123!")
 
-        # Check redirection based on the environment
-        self.assertIn(self.base_url, self.browser.current_url)
+        logout_button = WebDriverWait(self.browser, 10).until(
+            lambda browser: browser.find_element(By.CLASS_NAME, "logout-btn")
+        )
+        self.assertIsNotNone(logout_button)  # Ensure the logout button exists
+

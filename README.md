@@ -1,38 +1,31 @@
-GROUP MEMBERS
+🎨 Hobbies Web App
+A Django + Vue web application that allows users to create accounts, manage their profiles, track hobbies, find similar users, and send friend requests.
 
-JAI JOSHI - 220282907
-VINEJI SATHANANTHAN - 220445867 
-KARISHAN SHANDRAKUMAR - 220226118
+🚀 Features
+User Authentication: Signup, login, and logout using Django's authentication system with a custom user model.
+Profile Management: Users can update their name, email, date of birth, password, and hobbies.
+Hobbies Database: Users can select existing hobbies or add new ones, which become available to all users.
+Find Similar Users: View users with the most hobbies in common, sorted in descending order, with pagination.
+Filtering by Age: Users can filter results by age range via AJAX requests.
+Friend Requests: Users can send & accept friend requests via Vue + fetch API.
+🛠️ Tech Stack
+Backend: Django, Django REST Framework (DRF)
+Frontend: Vue 3 (TypeScript), Fetch API
+Database: PostgreSQL / SQLite
+Authentication: Django's built-in authentication
+Testing: Selenium-based end-to-end (E2E) tests
+🔬 Automated Testing
+The project includes tests for:
+✅ Account creation (signup)
+✅ Login
+✅ Editing profile data
+✅ Viewing users & filtering by age
+✅ Sending a friend request
+✅ Accepting friend requests
 
-Karishan- Assigned Login, authentication and editing user settings, created the admin databases for users and friendships. He did all of this and helped out on deployment and a bit of testing
-Jai- Assigned User hobbies (creating hobby database, editing user hobbies, adding new hobbies for everyone). He did all of this plus most of testing functions and some of deployment
-Vineji- Assigned Otherpage.vue including pagination and filtering age, also did add and accept friend request functionality including adding this to Mainpage.vue and created friendships database. He did all of this plus pinia global store and a some of deployment 
-
-Deployed application URL : https://group4-web-apps-ec22899.apps.a.comp-teach.qmul.ac.uk/
-
----- ADMIN ACCOUNT ----
-Username: admin
-password : 12345678
-
-
----- Test User 1 ----
-Username: johnsmith
-Password: qW3!pLz8
-
----- Test User 2 ----
-Username: sarahjohnson
-Password: 9Xs*7Bq4
-
----- Test User 3 ----
-Username: michaelbrown
-Password: Fg5$wT8v
-
----- Test User 4 ----
-Username: emilydavis
-Password: Kt3#Lm6q
-
----- Test User 5 ----
-Username: danielwilson
-Password: Zp7^Nm4y
-
+🌍 Deployment
+The app is deployed on EECS OpenShift.
+Preloaded with:
+✔️ 20 test users
+✔️ 10 hobbies
 

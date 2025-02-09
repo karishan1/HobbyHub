@@ -42,16 +42,20 @@
   body {
     background-color: #f4f4f9;
     color: #333;
+    height: 100%;  /* Ensure the body fills the page height */
   }
   
+  /* This container ensures the entire layout (header, content, footer) is arranged in a column */
   .website-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    height: 100%;
   }
   
   .main-content {
-    flex-grow: 1;
+    flex-grow: 1; /* Ensures content takes available space */
+    overflow-y: auto; /* Allows content to scroll if necessary */
   }
   
   .header {
@@ -95,6 +99,7 @@
     padding: 1rem;
     text-align: center;
     font-size: 0.9rem;
+    margin-top: auto; /* Ensures footer stays at the bottom */
   }
   </style>
   

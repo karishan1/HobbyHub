@@ -24,7 +24,8 @@ from .views import main_spa
 
 urlpatterns = [
     re_path("home", main_spa),
-    path("", views.login_view, name="login"),
+    path("login/", views.login_view, name="login"),
+    path("", views.landing_page_view, name="landing"),  
     path("other/", views.home_view),
     path("home/", views.home_view, name="home"),
     path("logout/",views.logout_view, name = "logout"),

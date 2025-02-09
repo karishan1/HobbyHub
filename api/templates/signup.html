@@ -1,155 +1,234 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>Sign Up | HobbyHub</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="signup-container">
-        <h1>Create Account</h1>
+    <div class="signup-wrapper">
+        <div class="signup-container">
+            <h1 class="brand-title">HobbyHub</h1> <!-- ADDED BRAND HEADING -->
+            <h2>Create Account</h2>
 
-        {% if form.errors %}
-            <div class="error">
-                <ul>
-                    {% for field, errors in form.errors.items %}
-                        <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+            {% if form.errors %}
+                <div class="error">
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
 
-        <form method="post" class="form">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter Username" value="{{ form.username.value|default:'' }}" required>
-            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter Username" value="{{ form.username.value|default:'' }}" required>
+                </div>
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter Email Address" value="{{ form.email.value|default:'' }}" required>
-            </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter Email Address" value="{{ form.email.value|default:'' }}" required>
+                </div>
 
-            <div class="form-group">
-                <label for="DOB">Date of Birth</label>
-                <input type="date" id="DOB" name="DOB" value="{{ form.DOB.value|default:'' }}" required>
-            </div>
+                <div class="form-group">
+                    <label for="DOB">Date of Birth</label>
+                    <input type="date" id="DOB" name="DOB" value="{{ form.DOB.value|default:'' }}" required>
+                </div>
 
-            <div class="form-group">
-                <label for="password1">Password</label>
-                <input type="password" id="password1" name="password1" placeholder="Enter Password" required>
-            </div>
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" id="password1" name="password1" placeholder="Enter Password" required>
+                </div>
 
-            <div class="form-group">
-                <label for="password2">Confirm Password</label>
-                <input type="password" id="password2" name="password2" placeholder="Retype Password" required>
-            </div>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" id="password2" name="password2" placeholder="Retype Password" required>
+                </div>
 
-            <button type="submit" class="btn">Sign Up</button>
-        </form>
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
 
-        <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+            <p>Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+        </div>
     </div>
 </body>
 </html>
 <style>
-/* General Styles */
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
+    /* General Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(to right, #1E3C72, #2A5298);
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
+/* Signup Wrapper */
+.signup-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
 }
 
 /* Signup Container */
 .signup-container {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.signup-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* HobbyHub Title */
+.brand-title {
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ff9800, #ff5e00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Form Headings */
+h2 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
 }
 
 /* Form Styles */
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
 label {
     display: block;
-    font-weight: bold;
+    font-weight: 500;
     margin-bottom: 5px;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 15px;
 }
 
 input {
-    width: 22rem;
-    padding: 10px;
+    width: 100%;
+    height: 2.5rem;
+    padding-left: 0.7rem;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 input:focus {
-    border-color: #007BFF;
+    border-color: #ff9800;
     outline: none;
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
 }
 
 /* Button Styles */
 .btn {
-    width: 23.5rem;
-    height: 2.8rem;
-    background: #007BFF;
-    color: #fff;
+    width: 100%;
+    height: 3rem;
+    background: linear-gradient(135deg, #ff9800, #ff5e00);
+    color: white;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1rem;
-    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease-in-out;
 }
 
 .btn:hover {
-    background: #0056b3;
+    background: linear-gradient(135deg, #ff5e00, #ff9800);
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+    transform: scale(1.05);
 }
 
 /* Error Message */
 .error {
-    color: red;
+    color: rgb(255, 78, 78);
     font-size: 0.9rem;
     margin-bottom: 15px;
-    text-align: center;
 }
 
 /* Signup Link */
 p {
-    text-align: center;
     margin-top: 15px;
+    font-size: 1rem;
 }
 
 a {
-    color: #007BFF;
+    color: #ff9800;
     text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease-in-out;
 }
 
 a:hover {
+    color: #ff5e00;
     text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .signup-container {
+        width: 90%;
+    }
+
+    .brand-title {
+        font-size: 2.5rem;
+    }
 }
 
 </style>

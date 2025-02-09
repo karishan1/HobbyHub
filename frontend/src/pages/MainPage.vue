@@ -81,19 +81,19 @@
     
       <div v-if="showHobbiesModal" class="modal">
         <div class="modal-content">
-          <h4>Add hobby</h4>
-          <div class="add_new_hobby">
-            <input v-model="newHobbyName" placeholder="Enter your own hobby" />
-            <button @click="addNewHobby" class="add-btn">Add Hobby</button>
-          </div>
-          <h4 style="margin-top: 1.3rem;">Choose from available hobbies</h4>
-          <ul class="choose_hobby">
-            <li  v-for="hobby in availableHobbies.filter(h => !userStore.hobbies.includes(h.hobby_name))" :key="hobby.id" >
-              <p>{{ hobby.hobby_name }}</p>
-              <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
-            </li>
-          </ul>
-          <button style="align-self: flex-end; margin-right: 0.8rem;" @click="showHobbiesModal = false" class="cancel-btn">Close</button>
+            <h4>Add Hobby</h4>
+            <div class="add_new_hobby">
+                <input v-model="newHobbyName" placeholder="Enter your own hobby" class="input-field"/>
+                <button @click="addNewHobby" class="add-btn">Add Hobby</button>
+            </div>
+            <h4 style="margin-top: 1.3rem;">Choose from available hobbies</h4>
+            <ul class="choose_hobby">
+                <li v-for="hobby in availableHobbies.filter(h => !userStore.hobbies.includes(h.hobby_name))" :key="hobby.id">
+                    <p>{{ hobby.hobby_name }}</p>
+                    <button @click="addExistingHobby(hobby.id)" class="add-btn">Add</button>
+                </li>
+            </ul>
+            <button style="align-self: flex-end; margin-right: 0.8rem;" @click="showHobbiesModal = false" class="cancel-btn">Close</button>
         </div>
       </div>
       <div v-if="showRequestsModal == true" class="modal">
@@ -487,451 +487,216 @@ export default defineComponent({
 });
 </script>
 
+<style scoped>
+/* General Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-  <style scoped>
-  /* Main Container */
-  .mainpage-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 1rem;
-    font-family: Arial, sans-serif;
-    position: relative;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
 
-  /* Title */
-  .title {
-    text-align: center;
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-  }
+body {
+  background: linear-gradient(to right, #1E3C72, #2A5298);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+}
 
-  /* Error */
-  .error {
-    color: red;
-    text-align: center;
-    font-weight: bold;
-    background-color: #ffe6e6;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-  }
+.title {
+  font-size: 3rem;
+  color: #ff7f00;
+  margin-bottom: 30px;
+  font-weight: 700;
+  text-align: center;
+}
 
-  /* Content Container */
-  .content-container {
-    display: flex;
-    gap: 2rem;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
+.error {
+  color: #ff4d4d;
+  font-weight: bold;
+}
 
-  /* Blob Styling */
-  .blob {
-    background-color: #f9f9f9;
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    max-width: 45%;
-    min-width: 300px;
-  }
+/* User Info & Hobbies Section */
+.content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
-  /* Labels */
-  .label {
-    font-weight: bold;
-    color: #007bff;
-  }
+.blob {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  width: 90%;
+  max-width: 850px;
+  backdrop-filter: blur(20px);
+  color: black;
+  text-align: left;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin: 0 auto;
+}
 
-  /* Input */
-  .input {
-    display: block;
-    margin: 0.5rem 0 1rem;
-    padding: 0.5rem;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
+.blob:hover {
+  transform: scale(1.03);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.5);
+}
 
-  /* Buttons */
-  .edit-btn,
-  .save-btn,
-  .cancel-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-  .edit-btn-1{
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 1rem;
-    margin-left: 8rem;
+.blob h2 {
+  margin-bottom: 15px;
+  color: #ff7f00;
+  font-size: 2rem;
+}
 
-  }
+.blob p {
+  color: black;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
 
-  .save-btn {
-    background-color: #28a745;
-  }
+/* Form Styling */
+.label {
+  font-weight: bold;
+  display: block;
+  margin-top: 15px;
+  color: black;
+  font-size: 1.1rem;
+}
 
-  .cancel-btn {
-    background-color: #dc3545;
-    margin-left: 1rem;
-  }
+.input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  color: black;
+  font-size: 1rem;
+}
 
-  .edit-btn:hover,
-  .save-btn:hover,
-  .cancel-btn:hover {
-    opacity: 0.8;
-  }
+.input::placeholder {
+  color: rgba(0, 0, 0, 0.7);
+}
 
-  /* Hobbies List */
-  .hobby-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 12rem;
-    overflow-y: auto;
-  }
+.input:focus {
+  border-color: #ff9800;
+  outline: none;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.7);
+}
 
-  .hobby-list li{
-    display: flex;
-    flex-direction: row;
-    width: auto;
-    background-color: white;
-    align-items: center;
-    color: black;
-    height: 2.5rem;
-    border-radius: 0.3rem;
-    padding-left: 1rem;
-    gap: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-    border: 1.5px black solid;
-    border-right: none;
-  }
+/* Buttons */
+button {
+  padding: 14px 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+  margin: 10px;
+}
 
-  .hobby-list li p{
-    margin: 0;
-    padding: 0;
-  }
+button:hover {
+  transform: scale(1.07);
+}
 
-  .hobby-list button{
-    height: 2.5rem;
-    border: none;
-    width: auto;
-    background-color: #dc3545;
-    border-top-right-radius: 0.3rem;
-    border-bottom-right-radius: 0.3rem;
-    color: white;
-    padding-left: 0.9rem;
-    padding-right: 0.9rem;
-  }
+.save-btn, .edit-btn, .edit-btn-1 {
+  background: linear-gradient(135deg, #ff9800, #ff5e00);
+  color: white;
+}
 
-  .hobby-list button:hover{
-    background-color: #ff5162;
+.cancel-btn, .close-request-modal {
+  background: #ff4d4d;
+  color: white;
+}
 
-  }
+.logout-btn {
+  background: #d9534f;
+  color: white;
+}
 
+.show-requests {
+  background: #f39c12;
+  color: white;
+}
 
+.add-btn, .accept {
+  background: #28a745;
+  color: white;
+}
 
-  /* Loading */
-  .loading {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #555;
-  }
+/* Hobbies Section */
+.hobby-list {
+  list-style: none;
+  padding: 0;
+}
 
-  .form-error {
-    color: red;
-    font-size: 0.9rem;
-    margin-top: 0.3rem;
-  }
+.hobby-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  margin: 8px 0;
+  color: black;
+}
 
-  .modal {
+/* Modal Styling */
+.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.modal-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
+.modal-content,
+.modal-content-requests {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  width: 90%;
   max-width: 500px;
-  width: 100%;
-}
-
-.modal-content h4{
-  align-self: flex-start;
-  margin-left: 1rem;
-}
-
-.choose_hobby{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  width: 27rem;
-  max-height: 15rem;
-  margin: 0;
-  padding: 0;
-  gap: 0.5rem;
-  overflow-y: auto;
-}
-.choose_hobby li {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: auto;
-  background-color: white;
+  text-align: center;
   color: black;
-  height: 2.5rem;
-  border-radius: 0.3rem;
-  padding-left: 1rem;
-  gap: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-  border: 1.5px black solid;
-  border-right: none;
-}
-.choose_hobby li p{
-  margin: 0;
-  padding: 0;
+  backdrop-filter: blur(20px);
 }
 
-.choose_hobby li button{
-  border: none;
-  font-size: 0.85rem;
-  height: 2.5rem;
-  background-color: #0aa32e;
-  border-top-right-radius: 0.3rem;
-  border-bottom-right-radius: 0.3rem;
-  padding-left: 0.7rem;
-  padding-right: 0.7rem;
-  color: white;
-  border: 1.5px #0aa32e solid;
-
+.modal-request-container {
+  margin-top: 15px;
 }
 
-.choose_hobby li button:hover{
-  background-color: #1bce44;
-  border: 1.5px #1bce44 solid;
-}
-
-.add_new_hobby{
-  margin-top: 0.5rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 27rem;
-}
-
-.add_new_hobby input{
-  width: 18rem;
-  height: 2.4rem;
-  border-radius: 0.3rem;
-  border: black 1.5px solid;
-  font-size: 1rem;
-  padding-left: 0.5rem;
-}
-
-.add_new_hobby button{
-  color: white;
-  background-color: #0aa32e;
-  font-size: 0.9rem;
-  border: none;
-  width: 8rem;
-  border-radius: 0.3rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-}
-
-.add_new_hobby button:hover{
-  background-color: #0aa32ec8;
-  transition: 0.2s ease;
-}
-
-
-
-.remove-btn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 1.5rem;
-  height: 1.5rem;
-  font-size: 0.9rem;
+.no-requests {
   font-weight: bold;
-  cursor: pointer;
-  margin-left: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: black;
 }
 
-.remove-btn:hover {
-  background: #c82333;
-}
-
-.scrollable-list {
-  max-height: 200px; 
-  overflow-y: auto; 
-  border: 1px solid #ccc; 
-  padding: 0.5rem;
-  border-radius: 5px; 
-}
-.friend-request-container{
-  justify-self: flex-end;
-  background-color: #007bff;
-  width: 33rem;
-  height: 20rem;
-}
-
-.modal-content-requests{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background-color: white;
-  border-radius: 1rem;
-  width: 40rem;
-  height: 30rem;
-  gap: 1rem;
-}
-.modal-request-container{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 21rem;
-  width: 35rem;
-
-}
-
-.modal-request-container ul{
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-
-  max-height: 22rem;
-  overflow-y: auto;
-}
-.modal-request-container li div{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 35rem;
-  height: 3.5rem;
-  margin-right: 2rem;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-.modal-request-container li div p{
-  display: flex;
-  align-items: center;
-  margin-top: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-  border-radius: 0.5rem;
-  height: 3rem;
-  padding-right: 1rem;
-  padding-left: 1rem;
-  background-color: #007bff;
-  color: white;
-}
-.accept{
-  border: none;
-  height: 3rem;
-  width: 6rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-  background-color: #0aa32e;
-  color: white;
-  font-size: 1rem;
-}
-.accept:hover{
-  background-color: #05c732;
-  transition: ease 0.3s;
-}
-.close-request-modal{
-  background-color: #c82333;
-  color: white;
-  align-self: flex-end;
-  margin-right: 2rem;
-  border: none;
-  width: 5rem;
-  height: 2.5rem;
-  border-radius: 0.5rem;
-}
-.close-request-modal:hover{
-  background-color: #f02b3e;
-  transition: ease 0.1s;
-
-}
-.no-requests{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 7rem;
-  background-color: #b5b5b5;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.248);
-  width: 20rem;
-  height: 6rem;
-  color: white;
-  font-size: 1.4rem;
-  border-radius: 0.7rem;
-}
-.show-requests{
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 1rem;
-  margin-left: 9.6rem;
-}
-.show-requests:hover{
-  background-color: #007bffc5;
-  transition: 0.2s ease;
-
-}
-.logout-btn {
-  background-color: #dc3545; 
-  color: white;
-  border: none;
-  padding-right: 1rem;
-  padding-left: 1rem;
-  border-radius: 5px;
-  height: 2.5rem;
-  cursor: pointer;
-}
-.logout-btn:hover {
-  opacity: 0.8;
-}
-
-
-.form-error {
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .blob, .modal-content, .modal-content-requests {
+    width: 95%;
+  }
 }
 
 </style>
+
+

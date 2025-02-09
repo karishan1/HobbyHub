@@ -25,6 +25,9 @@ def get_csrf_token(request: HttpRequest) -> JsonResponse:
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html')
 
+def landing_page_view(request):
+    return render(request, "landing.html")
+
 @login_required
 def hobby_db_view(request: HttpRequest) -> JsonResponse:
     """
